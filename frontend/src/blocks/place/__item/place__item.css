@@ -1,0 +1,8 @@
+.place__item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 282px;
+    background-color: #fff;
+    border-radius: 10px;
+}

@@ -1,0 +1,12 @@
+.place__btn-hart{
+    border: none;
+    cursor: pointer;
+    background: url(../../../images/hart-blank.svg) center no-repeat;
+    outline: none;
+    width: 30px;
+    height: 20px;
+}
+
+.place__btn-hart:hover {
+    opacity: 0.5;
+}

@@ -1,0 +1,11 @@
+.profile__btn-avatar {
+    background: transparent;
+    border: none;
+}
+
+.profile__btn-avatar:hover {
+    background-image: url(../../../images/Vector.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(0, 0, 0, 0.8);
+}

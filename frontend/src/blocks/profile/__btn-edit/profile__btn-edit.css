@@ -1,0 +1,8 @@
+.profile__btn-edit {
+    background: transparent;
+    border: none;
+}
+
+.profile__btn-edit:hover {
+    opacity: 0.6;
+}

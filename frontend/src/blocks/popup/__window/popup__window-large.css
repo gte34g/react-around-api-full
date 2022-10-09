@@ -1,0 +1,9 @@
+.popup__window-large {
+    display: flex;
+    padding: 0;
+    background: transparent;
+    max-height: 75vw;
+    max-width: 75vw;
+    width: auto;
+
+}

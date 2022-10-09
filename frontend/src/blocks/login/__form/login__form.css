@@ -1,0 +1,9 @@
+.login__form {
+    font-family: "Inter";
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    color: #ffff;
+}
+

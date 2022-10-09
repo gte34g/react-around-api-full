@@ -1,0 +1,6 @@
+.popup_active {
+    display: flex;
+    opacity: 1;
+    pointer-events: all;
+    visibility:visible;
+}
