@@ -1,4 +1,4 @@
-export const BASE_URL = "https://register.nomoreparties.co";
+export const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const customFetch = (url, headers) => {
   return fetch(url, headers).then((res) =>
