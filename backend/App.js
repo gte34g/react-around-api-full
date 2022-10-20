@@ -21,17 +21,11 @@ mongoose.connect('mongodb://localhost:27017/aroundb');
 
 app.use(cors());
 app.options('*', cors());
-app.use(bodyParser.json());
 app.use(helmet());
+app.use(bodyParser.json());
+
 app.use(requestLogger);
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
-app.use('/', errorPage);
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Server will crash now');
-  }, 0);
-});
+
 app.post('/signin', login);
 app.post(
   '/signup',
@@ -46,6 +40,15 @@ app.post(
   }),
   createUser,
 );
+
+app.use('/users', userRouter);
+app.use('/cards', cardRouter);
+app.use('/', errorPage);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+});
 
 app.use(errorLogger);
 // central error handler
