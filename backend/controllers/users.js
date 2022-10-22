@@ -12,7 +12,7 @@ const {
   USER_NOT_FOUND,
   INVALID_DATA,
   DEFAULT_ERROR,
-  Unauthorize,
+  UNAUTHORIZE,
   CONFLICT_ERROR,
 } = require('../lib/errors');
 
@@ -125,7 +125,7 @@ const login = (req, res, next) => {
       res.send({ data: user.toJSON(), token });
     })
     .catch(() => {
-      next(new Unauthorize('Incorrect email or password'));
+      next(new UNAUTHORIZE('Incorrect email or password'));
     });
 };
 

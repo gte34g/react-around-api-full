@@ -1,6 +1,6 @@
 const PASSED_CODE = 201;
 const ERROR_CODE = 400;
-const Unauthorize = 401;
+const UNAUTHORIZE = 401;
 const NOT_FOUND_ERROR = 404;
 const CONFLICT_ERROR = 409;
 const DEFAULT_ERROR_CODE = 500;
@@ -20,5 +20,5 @@ module.exports = {
   INVALID_DATA,
   DEFAULT_ERROR,
   CONFLICT_ERROR,
-  Unauthorize,
+  UNAUTHORIZE,
 };
