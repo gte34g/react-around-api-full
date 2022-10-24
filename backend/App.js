@@ -4,6 +4,7 @@ const app = express();
 const helmet = require('helmet');
 
 const { PORT = 3000 } = process.env;
+require('dotenv').config({ path: './.env' });
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');

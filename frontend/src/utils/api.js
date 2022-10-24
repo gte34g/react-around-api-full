@@ -75,8 +75,15 @@ class Api {
   }
 }
 
+let node_env = "production";
+
+let baseUrl =
+  node_env === "production"
+    ? process.env.REACT_APP_BASE_URL
+    : "http://localhost:3000";
+
 const api = new Api({
-  baseUrl: process.env.REACT_APP_BASE_URL,
+  baseUrl,
   headers: {
     authorization: "e5576ac3-5325-4ecf-8845-0a4515f9509c",
     "Content-Type": "application/json",
