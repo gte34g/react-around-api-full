@@ -7,10 +7,16 @@ const {
   disLikeCard,
 } = require('../controllers/cards');
 
-router.get('/', getCards);
-router.post('/', createCard);
-router.put('/:_id/likes', likeCard);
-router.delete('/:_id', deleteCardById);
-router.delete('/:_id/likes', disLikeCard);
+const {
+  authValidation,
+  cardValidationId,
+  newCardValidation,
+} = require('../middlewares/validation');
+
+router.get('/cards', authValidation, getCards);
+router.post('/cards', authValidation, newCardValidation, createCard);
+router.put('/cards/:_id/likes', authValidation, cardValidationId, likeCard);
+router.delete('/cards/:_id', authValidation, cardValidationId, deleteCardById);
+router.delete('/cards/:_id/likes', authValidation, cardValidationId, disLikeCard);
 
 module.exports = router;

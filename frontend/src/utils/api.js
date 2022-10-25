@@ -75,10 +75,10 @@ class Api {
   }
 }
 
-let node_env = "production";
+let NODE_ENV = "production";
 
 let baseUrl =
-  node_env === "production"
+  NODE_ENV === "production"
     ? process.env.REACT_APP_BASE_URL
     : "http://localhost:3000";
 

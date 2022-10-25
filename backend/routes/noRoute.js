@@ -1,5 +1,7 @@
-const errorPage = ((req, res) => {
-  res.status(404).send({ message: ` Route ${req.url} Not found.` });
-});
+const NOT_FOUND_ERROR = require('../errors/NotFound');
 
-module.exports = errorPage;
+const errorPage = (req, res, next) => {
+  next(new NOT_FOUND_ERROR('Requested resource not found'));
+};
+
+module.exports = { errorPage };

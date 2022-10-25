@@ -1,32 +1,30 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const { JWT_SECRET } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const User = require('../models/user');
 
+const NOT_FOUND_ERROR = ('../errors/NotFound');
+const ConflictError = ('../errors/ConflictError');
+const Validation = ('../errors/Validation.js');
+const Unauthorized = ('../errors/Unauthorized');
 const {
-  ERROR_CODE,
-  NOT_FOUND_ERROR,
   DEFAULT_ERROR_CODE,
   USER_NOT_FOUND,
   INVALID_DATA,
   DEFAULT_ERROR,
-  UNAUTHORIZE,
-  CONFLICT_ERROR,
+  SUCCESS_OK,
 } = require('../lib/errors');
 
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find({});
-
-    res.send(users);
-  } catch (err) {
-    res.send(DEFAULT_ERROR_CODE).send(err);
-  }
+const getUsers = (req, res, next) => {
+  User.find({})
+    .orFail(new NOT_FOUND_ERROR('Data is not found'))
+    .then((users) => res.status(SUCCESS_OK).send(users))
+    .catch(next);
 };
 
-const getUserById = async (req, res) => {
+const getUserById = async (req, res, next) => {
   const { _id } = req.params;
   User.findById(_id)
     .orFail()
@@ -35,11 +33,12 @@ const getUserById = async (req, res) => {
       if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND_ERROR).send({ Error: USER_NOT_FOUND });
       } else if (err.name === 'CastError') {
-        res.status(NOT_FOUND_ERROR).send({ Error: INVALID_DATA });
+        res.status(Validation).send({ Error: INVALID_DATA });
       } else {
         res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
       }
-    });
+    })
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
@@ -49,7 +48,7 @@ const createUser = (req, res, next) => {
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        throw new CONFLICT_ERROR('Email already exists');
+        throw new ConflictError('Email already exists');
       }
       return bcrypt.hash(password, 10);
     })
@@ -61,71 +60,82 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(201).send({
+      _id: user._id,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ERROR_CODE(err.message));
+        next(new Validation(err.message));
       } else {
         next(err);
       }
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { _id } = req.user;
   User.findByIdAndUpdate(
     _id,
     { name: req.body.name, about: req.body.about },
     { runValidators: true, new: true },
   )
-    .orFail()
-    .then((user) => res.send(user))
+    .orFail(new NOT_FOUND_ERROR('Data is not found'))
+    .then((user) => res.status(SUCCESS_OK).send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND_ERROR).send({ Error: USER_NOT_FOUND });
-      } else if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
-      } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ Error: err.message });
-      } else {
-        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
+      if (err.name === 'CastError') {
+        return next(new Validation('Invalid data'));
+      } if (err.name === 'ValidationError') {
+        return next(new Validation('Invalid data'));
       }
+      return next(err);
     });
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { _id } = req.user;
   User.findByIdAndUpdate(
     _id,
     { avatar: req.body.avatar },
     { runValidators: true, new: true },
   )
-    .orFail()
-    .then((user) => res.send(user))
+    .orFail(new NOT_FOUND_ERROR('Data is not found'))
+    .then((user) => res.status(SUCCESS_OK).send(user))
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND_ERROR).send({ Error: USER_NOT_FOUND });
-      } else if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
-      } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ Error: err.message });
-      } else {
-        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
+      if (err.name === 'CastError') {
+        return next(new Validation('Invalid data'));
+      } if (err.name === 'ValidationError') {
+        return next(new Validation('Invalid data'));
       }
+      return next(err);
     });
+};
+
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail(new NOT_FOUND_ERROR('Data is not found'))
+    .then((user) => res.status(SUCCESS_OK).send(user))
+    .catch(next);
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: '7d',
-      });
-      res.send({ data: user.toJSON(), token });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
+        {
+          expiresIn: '7d',
+        },
+      );
+      res.send({ token });
     })
     .catch(() => {
-      next(new UNAUTHORIZE('Incorrect email or password'));
+      next(new Unauthorized('Incorrect email or password'));
     });
 };
 
@@ -136,4 +146,5 @@ module.exports = {
   updateUser,
   updateAvatar,
   login,
+  getCurrentUser,
 };
