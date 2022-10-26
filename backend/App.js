@@ -1,10 +1,9 @@
-import rateLimit from 'express-rate-limit';
-
 const express = require('express');
 
 const app = express();
 const helmet = require('helmet');
 const { errors } = require('celebrate');
+const rateLimit = require('express-rate-limit');
 
 const { PORT = 3000 } = process.env;
 require('dotenv').config({ path: './.env' });
@@ -48,7 +47,7 @@ app.get('/crash-test', () => {
 });
 
 app.use(errorLogger);
-// central error handler
+
 app.use(errors());
 app.use(errorHandler);
 app.listen(PORT, () => {
