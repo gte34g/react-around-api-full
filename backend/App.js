@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { validationUser, validationLogin } = require('./middlewares/validation');
+const { validateUser, validateLogin } = require('./middlewares/validation');
 const errorHandler = require('./middlewares/errorHandler');
 
 const userRouter = require('./routes/users');
@@ -34,8 +34,8 @@ app.use(bodyParser.json());
 
 app.use(requestLogger);
 
-app.post('/signin', validationLogin, login);
-app.post('/signup', validationUser, createUser);
+app.post('/signin', validateLogin, login);
+app.post('/signup', validateUser, createUser);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
