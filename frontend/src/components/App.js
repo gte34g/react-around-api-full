@@ -44,7 +44,7 @@ function App() {
     isAddPlacePopupOpen ||
     isEditAvatarPopupOpen ||
     isImagePreviewOpen;
-  
+
 
 
   React.useEffect(() => {
@@ -53,17 +53,13 @@ function App() {
       auth
         .checkToken(token)
         .then((res) => {
-          if (res.data._id) {
             setEmail(res.data.email);
             setIsLoggedIn(true);
             history.push("/");
-          } else {
-            localStorage.removeItem("token");
-          }
         })
         .catch((err) => console.log(err));
     }
-  }, []);
+  }, [history]);
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -168,7 +164,7 @@ function App() {
     setIsImagePreviewOpen(false);
     setIsInfoTooltipOpen(false);
   };
-  
+
   React.useEffect(() => {
     const closeByEscape = (e) => {
       if (e.key === "Escape") {
@@ -228,7 +224,7 @@ function App() {
      setIsLoggedIn(false);
      history.push("/signin");
    }
-  
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <CardsContext.Provider value={cards}>
