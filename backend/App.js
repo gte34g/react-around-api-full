@@ -39,18 +39,10 @@ app.post('/signup', validateUser, createUser);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use('/', errorPage);
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Server will crash now');
-  }, 0);
-});
+app.use('*', errorPage);
 
 app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`App listening at port ${PORT}`);
-});
+app.listen(PORT);
