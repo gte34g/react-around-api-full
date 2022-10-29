@@ -4,6 +4,7 @@ const app = express();
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
+require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
 require('dotenv').config({ path: './.env' });
@@ -13,10 +14,10 @@ const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateUser, validateLogin } = require('./middlewares/validation');
 const errorHandler = require('./middlewares/errorHandler');
-
+const auth = require('./middlewares/auth');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const errorPage = require('./routes/noRoute');
+const noRoute = require('./routes/noRoute');
 
 const { login, createUser } = require('./controllers/users');
 
@@ -37,9 +38,11 @@ app.use(requestLogger);
 app.post('/signin', validateLogin, login);
 app.post('/signup', validateUser, createUser);
 
+app.use(auth);
+
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use('*', errorPage);
+app.use('*', noRoute);
 
 app.use(errorLogger);
 
