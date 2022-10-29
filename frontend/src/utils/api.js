@@ -79,7 +79,7 @@ let NODE_ENV = "production";
 
 let baseUrl =
   NODE_ENV === "production"
-    ? process.env.REACT_APP_BASE_URL
+    ? 'https://api.gte34g.students.nomoredomainssbs.ru'
     : "http://localhost:3000";
 
 const api = new Api({
