@@ -1,11 +1,13 @@
 class Api {
   constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
+
     this._headers = headers;
   }
 
   _customFetch = async (url, headers) => {
     const res = await fetch(url, headers);
+
     if (res.ok) {
       return res.json();
     } else {
@@ -28,15 +30,19 @@ class Api {
   createCard(data) {
     return this._customFetch(`${this._baseUrl}/cards`, {
       headers: this._headers,
+
       method: "POST",
+
       body: JSON.stringify(data),
     });
   }
 
   deleteCard(cardId) {
     console.log(cardId);
+
     return this._customFetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
+
       headers: this._headers,
     });
   }
@@ -44,9 +50,12 @@ class Api {
   editProfile({ name, about }) {
     return this._customFetch(`${this._baseUrl}/users/me`, {
       headers: this._headers,
+
       method: "PATCH",
+
       body: JSON.stringify({
         name,
+
         about,
       }),
     });
@@ -56,11 +65,13 @@ class Api {
     if (!likeState) {
       return this._customFetch(`${this._baseUrl}/cards/likes/${cardId}`, {
         headers: this._headers,
+
         method: "DELETE",
       });
     } else {
       return this._customFetch(`${this._baseUrl}/cards/likes/${cardId}`, {
         headers: this._headers,
+
         method: "PUT",
       });
     }
@@ -69,21 +80,24 @@ class Api {
   setUserAvatar(avatar) {
     return this._customFetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
+
       headers: this._headers,
+
       body: JSON.stringify(avatar),
     });
   }
 }
 
-let NODE_ENV = "production";
+let node_env = "production";
 
 let baseUrl =
-  NODE_ENV === "production"
-    ? 'https://api.gte34g.students.nomoredomainssbs.ru'
+  node_env === "production"
+    ? "https://api.gte34g.students.nomoredomainssbs.ru"
     : "http://localhost:3000";
 
 const api = new Api({
   baseUrl,
+
   headers: {
     authorization: "e5576ac3-5325-4ecf-8845-0a4515f9509c",
     "Content-Type": "application/json",
