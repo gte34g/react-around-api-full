@@ -75,15 +75,13 @@ class Api {
   }
 }
 
-let NODE_ENV = "production";
-
-let baseUrl =
-  NODE_ENV === "production"
-    ? 'https://api.gte34g.students.nomoredomainssbs.ru'
+const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.gte34g.students.nomoredomainssbs.ru"
     : "http://localhost:3000";
 
 const api = new Api({
-  baseUrl,
+  baseUrl: BASE_URL,
   headers: {
     authorization: "e5576ac3-5325-4ecf-8845-0a4515f9509c",
     "Content-Type": "application/json",
