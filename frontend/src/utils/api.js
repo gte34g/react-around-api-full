@@ -1,13 +1,11 @@
 class Api {
   constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
-
     this._headers = headers;
   }
 
   _customFetch = async (url, headers) => {
     const res = await fetch(url, headers);
-
     if (res.ok) {
       return res.json();
     } else {
@@ -88,18 +86,10 @@ class Api {
   }
 }
 
-let node_env = "production";
-
-let baseUrl =
-  node_env === "production"
-    ? "https://api.gte34g.students.nomoredomainssbs.ru"
-    : "http://localhost:3000";
-
 const api = new Api({
-  baseUrl,
-
+  baseUrl: "https://api.gte34g.students.nomoredomainssbs.ru",
   headers: {
-    authorization: "e5576ac3-5325-4ecf-8845-0a4515f9509c",
+    authorization: `Bearer ${localStorage.getItem("token")}`,
     "Content-Type": "application/json",
   },
 });
