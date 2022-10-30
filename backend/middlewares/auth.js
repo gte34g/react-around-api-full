@@ -9,12 +9,12 @@ const auth = (req, res, next) => {
     return next(new Unauthorized('You are not authorized'));
   }
 
-  let payload;
   const token = authorization.replace('Bearer ', '');
+  let payload;
   try {
     payload = jwt.verify(
       token,
-      NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
+      NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
     );
   } catch (err) {
     return next(new Unauthorized('You are not authorized'));
