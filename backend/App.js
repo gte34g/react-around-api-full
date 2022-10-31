@@ -4,7 +4,6 @@ const app = express();
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config();
 
 const { PORT = 3000 } = process.env;
 require('dotenv').config({ path: './.env' });
