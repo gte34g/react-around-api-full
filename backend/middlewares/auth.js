@@ -9,8 +9,8 @@ const auth = (req, res, next) => {
     return next(new Unauthorized('You are not authorized'));
   }
 
-  let payload;
   const token = authorization.replace('Bearer ', '');
+  let payload;
   try {
     payload = jwt.verify(
       token,

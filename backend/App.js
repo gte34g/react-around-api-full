@@ -11,12 +11,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { validationUser, validationLogin } = require('./middlewares/validation');
+const { validateUser, validateLogin } = require('./middlewares/validation');
 const errorHandler = require('./middlewares/errorHandler');
-
+const auth = require('./middlewares/auth');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const errorPage = require('./routes/noRoute');
+const noRoute = require('./routes/noRoute');
 
 const { login, createUser } = require('./controllers/users');
 
@@ -34,23 +34,17 @@ app.use(bodyParser.json());
 
 app.use(requestLogger);
 
-app.post('/signin', validationLogin, login);
-app.post('/signup', validationUser, createUser);
+app.post('/signin', validateLogin, login);
+app.post('/signup', validateUser, createUser);
+
+app.use(auth);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
-app.use('/', errorPage);
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Server will crash now');
-  }, 0);
-});
+app.use('*', noRoute);
 
 app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`App listening at port ${PORT}`);
-});
+app.listen(PORT);
