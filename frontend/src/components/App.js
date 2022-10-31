@@ -88,7 +88,7 @@ function App() {
         setCurrentUser(res);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [isLoggedIn]);
 
   function handleUpdateUser({ name, about }) {
     api
@@ -155,7 +155,7 @@ function App() {
         setCards(res);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [isLoggedIn]);
 
   const closeAllPopups = () => {
     setIsAddPlacePopupOpen(false);
