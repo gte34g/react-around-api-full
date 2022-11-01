@@ -155,7 +155,7 @@ function App() {
         setCards(res);
       })
       .catch((err) => console.log(err));
-  }, [isLoggedIn]);
+  }, []);
 
   const closeAllPopups = () => {
     setIsAddPlacePopupOpen(false);

@@ -5,12 +5,9 @@ class Api {
   }
 
   _customFetch(url, headers) {
-    return fetch(url, headers).then((res) => {
-      if (res) {
-        return res.json();
-      }
-      return Promise.reject(`Error: ${res.status}`);
-    });
+    return fetch(url, headers).then((res) =>
+      res.ok ? res.json() : Promise.reject(`Error: ${res.status}`)
+    );
   }
 
   getInitialCards() {
@@ -86,10 +83,19 @@ class Api {
   }
 }
 
+let NODE_ENV = "production";
+
+let baseUrl =
+  NODE_ENV === "production"
+    ? process.env.REACT_APP_BASE_URL
+    : "http://localhost:3000";
+
 const api = new Api({
-  baseUrl: "https://api.gte34g.students.nomoredomainssbs.ru",
+  baseUrl,
+
   headers: {
     authorization: "e5576ac3-5325-4ecf-8845-0a4515f9509c",
+
     "Content-Type": "application/json",
   },
 });
