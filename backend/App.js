@@ -40,6 +40,7 @@ app.post('/signup', validateUser, createUser);
 
 app.use(auth);
 
+app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 app.use('*', noRoute);
 

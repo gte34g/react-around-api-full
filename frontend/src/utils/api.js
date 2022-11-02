@@ -83,20 +83,18 @@ class Api {
   }
 }
 
-let NODE_ENV = "production";
+// let NODE_ENV = "production";
 
-let baseUrl =
-  NODE_ENV === "production"
-    ? process.env.REACT_APP_BASE_URL
-    : "http://localhost:3000";
+// let baseUrl =
+//   NODE_ENV === "production"
+//     ? process.env.REACT_APP_BASE_URL
+//     : "http://localhost:3000";
 
 const api = new Api({
-  baseUrl,
-
+  baseUrl: "https://api.gte34g.students.nomoredomainssbs.ru",
   headers: {
-    authorization: "e5576ac3-5325-4ecf-8845-0a4515f9509c",
-
     "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
