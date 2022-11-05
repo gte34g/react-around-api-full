@@ -1,7 +1,7 @@
-const router = require('express').Router();
+const NOT_FOUND_ERROR = require('../errors/NotFound');
 
-router.get('*', (req, res) => {
-  res.status(404).send({ message: 'Requested resource not found' });
-});
+const errorPage = (req, res, next) => {
+  next(new NOT_FOUND_ERROR('Requested resource not found'));
+};
 
-module.exports = router;
+module.exports = { errorPage };

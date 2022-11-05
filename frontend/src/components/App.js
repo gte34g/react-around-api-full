@@ -15,7 +15,7 @@ import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CardsContext } from "../contexts/CardsContext";
-import * as auth from "../utils/auth";
+import auth from "../utils/auth";
 
 function App() {
   const history = useHistory();
@@ -53,13 +53,17 @@ function App() {
       auth
         .checkToken(token)
         .then((res) => {
+          if (res.data._id) {
             setEmail(res.data.email);
             setIsLoggedIn(true);
             history.push("/");
+          } else {
+            localStorage.removeItem("token");
+          }
         })
         .catch((err) => console.log(err));
     }
-  }, [history]);
+  }, []);
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -88,7 +92,7 @@ function App() {
         setCurrentUser(res);
       })
       .catch((err) => console.log(err));
-  }, [isLoggedIn]);
+  }, []);
 
   function handleUpdateUser({ name, about }) {
     api
