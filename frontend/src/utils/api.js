@@ -75,16 +75,11 @@ class Api {
   }
 }
 
-const BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://api.gte34g.students.nomoredomainssbs.ru"
-    : "http://localhost:3000";
-
 const api = new Api({
-  baseUrl: BASE_URL,
+  baseUrl: "https://api.gte34g.students.nomoredomainssbs.ru",
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
+    authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
