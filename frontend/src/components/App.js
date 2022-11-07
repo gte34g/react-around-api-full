@@ -15,7 +15,7 @@ import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CardsContext } from "../contexts/CardsContext";
-import auth from "../utils/auth";
+import * as auth from "../utils/auth";
 
 function App() {
   const history = useHistory();
@@ -38,6 +38,7 @@ function App() {
 
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [toolTipStatus, setToolTipStatus] = React.useState("");
+  const [token, setToken] = React.useState(localStorage.getItem("jwt"));
 
   const isOpen =
     isEditProfilePopupOpen ||
@@ -86,13 +87,15 @@ function App() {
   }
 
   React.useEffect(() => {
-    api
-      .getUserInfo()
-      .then((res) => {
-        setCurrentUser(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (isLoggedIn) {
+      api
+        .getUserInfo()
+        .then((user) => {
+          setCurrentUser(user);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [isLoggedIn]);
 
   function handleUpdateUser({ name, about }) {
     api
@@ -153,13 +156,15 @@ function App() {
   }
 
   React.useEffect(() => {
-    api
-      .getInitialCards()
-      .then((res) => {
-        setCards(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (isLoggedIn) {
+      api
+        .getInitialCards(token)
+        .then((res) => {
+          setCards(res);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [token, isLoggedIn]);
 
   const closeAllPopups = () => {
     setIsAddPlacePopupOpen(false);
@@ -210,6 +215,8 @@ function App() {
          if (res.token) {
            setIsLoggedIn(true);
            setEmail(email);
+           setCurrentUser(res.user);
+           setToken(res.token);
            localStorage.setItem("jwt", res.token);
            history.push("/");
          } else {

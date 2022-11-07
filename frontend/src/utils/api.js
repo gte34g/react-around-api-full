@@ -4,14 +4,11 @@ class Api {
     this._headers = headers;
   }
 
-  _customFetch = async (url, headers) => {
-    const res = await fetch(url, headers);
-    if (res.ok) {
-      return res.json();
-    } else {
-      return Promise.reject(res.statusText);
-    }
-  };
+  _customFetch(url, headers) {
+    return fetch(url, headers).then((res) =>
+      res.ok ? res.json() : Promise.reject(`Error: ${res.status}`)
+    );
+  }
 
   getInitialCards() {
     return this._customFetch(`${this._baseUrl}/cards`, {
@@ -76,7 +73,7 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: "https://api.gte34g.students.nomoredomainssbs.ru",
+  baseUrl: process.env.REACT_APP_BASE_URL,
   headers: {
     "Content-Type": "application/json",
     authorization: `Bearer ${localStorage.getItem("token")}`,
