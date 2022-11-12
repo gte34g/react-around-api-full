@@ -8,7 +8,6 @@ const User = require('../models/user');
 const NOT_FOUND_ERROR = ('../errors/NotFound');
 const ConflictError = ('../errors/ConflictError');
 const Validation = ('../errors/Validation.js');
-const Unauthorized = ('../errors/Unauthorized');
 const {
   DEFAULT_ERROR_CODE,
   USER_NOT_FOUND,
