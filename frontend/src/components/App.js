@@ -215,8 +215,6 @@ function App() {
          if (res.token) {
            setIsLoggedIn(true);
            setEmail(email);
-           setCurrentUser(res.user);
-           setToken(res.token);
            localStorage.setItem("jwt", res.token);
            history.push("/");
          } else {

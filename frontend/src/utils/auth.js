@@ -1,7 +1,13 @@
 export const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+const customFetch = (url, headers) => {
+  return fetch(url, headers).then((res) =>
+    res.ok ? res.json() : Promise.reject(res.statusText)
+  );
+};
+
 export const register = (email, password) => {
-  return fetch(`${BASE_URL}/signup`, {
+  return customFetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -11,7 +17,7 @@ export const register = (email, password) => {
   });
 };
 export const login = (email, password) => {
-  return fetch(`${BASE_URL}/signin`, {
+  return customFetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -21,7 +27,7 @@ export const login = (email, password) => {
   });
 };
 export const checkToken = (token) => {
-  return fetch(`${BASE_URL}/users/me`, {
+  return customFetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
       Accept: "application/json",

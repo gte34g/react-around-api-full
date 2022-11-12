@@ -134,9 +134,7 @@ const login = (req, res, next) => {
       );
       res.send({ user, token });
     })
-    .catch(() => {
-      next(new Unauthorized('Incorrect email or password'));
-    });
+    .catch(next);
 };
 
 module.exports = {
