@@ -38,7 +38,7 @@ function App() {
 
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [toolTipStatus, setToolTipStatus] = React.useState("");
-  const [token, setToken] = React.useState(localStorage.getItem("jwt"));
+  // const [token, setToken] = React.useState(localStorage.getItem("jwt"));
 
   const isOpen =
     isEditProfilePopupOpen ||
@@ -64,7 +64,7 @@ function App() {
         })
         .catch((err) => console.log(err));
     }
-  }, []);
+  }, [history]);
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -156,15 +156,12 @@ function App() {
   }
 
   React.useEffect(() => {
-    if (isLoggedIn) {
-      api
-        .getInitialCards(token)
-        .then((res) => {
-          setCards(res);
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [token, isLoggedIn]);
+    isLoggedIn &&
+    api
+      .getInitialCards()
+      .then(setCards)
+      .catch((err) => console.log(err));
+  }, [isLoggedIn]);
 
   const closeAllPopups = () => {
     setIsAddPlacePopupOpen(false);
@@ -203,6 +200,9 @@ function App() {
          }
        })
        .catch((err) => {
+         console.log(err);
+       })
+     .finally(() => {
          setToolTipStatus("fail");
          setIsInfoTooltipOpen(true);
        });
@@ -223,6 +223,9 @@ function App() {
          }
        })
        .catch((err) => {
+         console.log(err);
+       })
+       .finally(() => {
          setToolTipStatus("fail");
          setIsInfoTooltipOpen(true);
        });

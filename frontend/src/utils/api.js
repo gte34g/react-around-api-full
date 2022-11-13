@@ -73,7 +73,7 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: process.env.REACT_APP_BASE_URL,
+  baseUrl: "https://api.gte34g.students.nomoredomainssbs.ru",
   headers: {
     "Content-Type": "application/json",
     authorization: `Bearer ${localStorage.getItem("token")}`,

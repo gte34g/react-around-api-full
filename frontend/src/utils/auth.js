@@ -1,4 +1,7 @@
-export const BASE_URL = process.env.REACT_APP_BASE_URL;
+export const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.gte34g.students.nomoredomainssbs.ru"
+    : "http://localhost:3000";
 
 const customFetch = (url, headers) => {
   return fetch(url, headers).then((res) =>
@@ -32,7 +35,7 @@ export const checkToken = (token) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      authorization: `Bearer ${token}`,
     },
   });
 };

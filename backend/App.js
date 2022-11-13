@@ -11,14 +11,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { validateUser, validateLogin } = require('./middlewares/validation');
 const errorHandler = require('./middlewares/errorHandler');
-const auth = require('./middlewares/auth');
-const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards');
-const errorPage = require('./routes/noRoute');
-
-const { login, createUser } = require('./controllers/users');
+const router = require('./routes');
 
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
@@ -34,14 +28,8 @@ app.use(bodyParser.json());
 
 app.use(requestLogger);
 
-app.post('/signin', validateLogin, login);
-app.post('/signup', validateUser, createUser);
+app.use(router);
 
-app.use(auth);
-
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
-app.use('/', errorPage);
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Server will crash now');

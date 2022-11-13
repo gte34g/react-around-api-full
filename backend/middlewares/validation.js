@@ -1,84 +1,100 @@
-const { celebrate, Joi } = require('celebrate');
+const { Joi, celebrate } = require('celebrate');
+const { isObjectIdOrHexString } = require('mongoose');
 
-const validator = require('validator');
+const urlRegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
 
-function validateUrl(string) {
-  if (!validator.isURL(string)) {
-    throw new Error('Invalid URL');
-  }
-  return string;
-}
-
-function validateEmail(string) {
-  if (!validator.isEmail(string)) {
-    throw new Error('Invalid Email');
-  }
-  return string;
-}
-
-const authValidation = celebrate({
-  headers: Joi.object()
-    .keys({
-      authorization: Joi.string().required(),
-    })
-    .unknown(true),
-});
-
-const validateUser = celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().custom(validateEmail),
-    password: Joi.string().required(),
-  }),
-});
-
-const validateLogin = celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().custom(validateEmail),
-    password: Joi.string().required(),
-  }),
-});
-
-const updateUserValidation = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-  }),
-});
-
-const updateAvatarValidation = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().required().custom(validateUrl),
-  }),
-});
-
-const validateUserdId = celebrate({
+const validateObjId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().hex().length(24),
+    id: Joi.string().required().custom((value, helpers) => {
+      if (isObjectIdOrHexString.isValid(value)) {
+        return value;
+      }
+      return helpers.message('Invalud id');
+    }),
   }),
 });
 
-const newCardValidation = celebrate({
+const validateCardBody = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().custom(validateUrl),
+    name: Joi.string().required().min(2).max(30)
+      .messages({
+        'string.min': 'The minimum length is 2',
+        'stting.max': 'The max length is 30',
+        'string.empty': 'This field must be filled up',
+      }),
+    link: Joi.string().required().pattern(urlRegExp)
+      .message('The "link" field must be a valid URL'),
   }),
 });
 
-const cardValidationId = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
+const validateUserBody = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30)
+      .messages({
+        'string.min': 'The minimum length is 2',
+        'stting.max': 'The max length is 30',
+      }),
+    about: Joi.string().min(2).max(30)
+      .message({
+        'string.min': 'The minimum length is 2',
+        'stting.max': 'The max length is 30',
+      }),
+    password: Joi.string().required()
+      .message({
+        'string.empty': 'The "password" field must be filled up',
+      }),
+    email: Joi.string().required().email()
+      .message('The "email" field, must be a valid email')
+      .messages({
+        'sring.required': 'The "email" field must be filled in',
+      }),
+    avatar: Joi.string().pattern(urlRegExp)
+      .message('The "avatar" field must be a valid URL'),
+  }),
+});
+
+const validateAuthentication = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email()
+      .message('The "email" field, must be a valid email')
+      .messages({
+        'sring.required': 'The "email" field must be filled in',
+      }),
+    password: Joi.string().required()
+      .messages({
+        'string.empty': 'The "password" field must be filled up',
+      }),
+  }),
+});
+
+const validateAvatar = celebrate({
+  body: {
+    avatar: Joi.string().required().pattern(urlRegExp)
+      .message('The "avatar" field must be a valid URL'),
+  },
+});
+
+const validateProfile = celebrate({
+  body: ({
+    name: Joi.string().min(2).max(30)
+      .messages({
+        'string.min': 'The minimum length is 2',
+        'stting.max': 'The max length is 30',
+      }),
+    about: Joi.string().min(2).max(30)
+      .message({
+        'string.min': 'The minimum length is 2',
+        'stting.max': 'The max length is 30',
+      }),
   }),
 });
 
 module.exports = {
-  authValidation,
-  validateUrl,
-  validateEmail,
-  validateUser,
-  validateLogin,
-  updateUserValidation,
-  updateAvatarValidation,
-  validateUserdId,
-  newCardValidation,
-  cardValidationId,
+  urlRegExp,
+  validateObjId,
+  validateCardBody,
+  validateUserBody,
+  validateAuthentication,
+  validateAvatar,
+  validateProfile,
 };
