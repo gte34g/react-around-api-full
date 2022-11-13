@@ -39,10 +39,10 @@ const validateUserBody = celebrate({
         'string.min': 'The minimum length is 2',
         'stting.max': 'The max length is 30',
       }),
-    password: Joi.string().required()
-      .message({
-        'string.empty': 'The "password" field must be filled up',
-      }),
+    password: Joi.string().required().min(8).messages({
+      'string.empty': 'Password is required',
+      'string.min': 'Password must be at least 8 characters long',
+    }),
     email: Joi.string().required().email()
       .message('The "email" field, must be a valid email')
       .messages({

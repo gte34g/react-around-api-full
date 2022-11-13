@@ -1,7 +1,4 @@
-export const BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://api.gte34g.students.nomoredomainssbs.ru"
-    : "http://localhost:3000";
+let BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const customFetch = (url, headers) => {
   return fetch(url, headers).then((res) =>
@@ -19,6 +16,7 @@ export const register = (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 };
+
 export const login = (email, password) => {
   return customFetch(`${BASE_URL}/signin`, {
     method: "POST",
@@ -29,13 +27,14 @@ export const login = (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 };
+
 export const checkToken = (token) => {
   return customFetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 };

@@ -5,40 +5,18 @@ const { JWT_SECRET } = require('../lib/config');
 
 const User = require('../models/user');
 
+const { processUserWithId } = require('../lib/helpers');
+
 const Unauthorized = ('../errors/Unauthorized');
-const NOT_FOUND_ERROR = ('../errors/NotFound');
 const ConflictError = ('../errors/ConflictError');
 const Validation = ('../errors/Validation.js');
-const {
-  DEFAULT_ERROR_CODE,
-  USER_NOT_FOUND,
-  INVALID_DATA,
-  DEFAULT_ERROR,
-  SUCCESS_OK,
-} = require('../lib/errors');
 
 const getUsers = (req, res, next) => {
-  User.find({})
-    .orFail(new NOT_FOUND_ERROR('Data is not found'))
-    .then((users) => res.status(SUCCESS_OK).send(users))
-    .catch(next);
+  processUserWithId(req, res, User.findById(req.user._id), next);
 };
 
 const getUserById = async (req, res, next) => {
-  const { _id } = req.params;
-  User.findById(_id)
-    .orFail()
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND_ERROR).send({ Error: USER_NOT_FOUND });
-      } else if (err.name === 'CastError') {
-        res.status(Validation).send({ Error: INVALID_DATA });
-      } else {
-        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
-      }
-    })
-    .catch(next);
+  processUserWithId(req, res, User.findById(req.params.id), next);
 };
 
 const createUser = (req, res, next) => {
@@ -77,48 +55,33 @@ const createUser = (req, res, next) => {
 };
 
 const updateUser = (req, res, next) => {
+  const { name, about } = req.body;
   const { _id } = req.user;
-  User.findByIdAndUpdate(
-    _id,
-    { name: req.body.name, about: req.body.about },
-    { runValidators: true, new: true },
-  )
-    .orFail(new NOT_FOUND_ERROR('Data is not found'))
-    .then((user) => res.status(SUCCESS_OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new Validation('Invalid data'));
-      } if (err.name === 'ValidationError') {
-        return next(new Validation('Invalid data'));
-      }
-      return next(err);
-    });
+  processUserWithId(
+    req,
+    res,
+    User.findByIdAndUpdate(
+      _id,
+      { name, about },
+      { runValidators: true, new: true },
+    ),
+    next,
+  );
 };
 
 const updateAvatar = (req, res, next) => {
   const { _id } = req.user;
-  User.findByIdAndUpdate(
-    _id,
-    { avatar: req.body.avatar },
-    { runValidators: true, new: true },
-  )
-    .orFail(new NOT_FOUND_ERROR('Data is not found'))
-    .then((user) => res.status(SUCCESS_OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new Validation('Invalid data'));
-      } if (err.name === 'ValidationError') {
-        return next(new Validation('Invalid data'));
-      }
-      return next(err);
-    });
+  const { avatar } = req.body;
+  processUserWithId(
+    req,
+    res,
+    User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }),
+    next,
+  );
 };
 
 const getCurrentUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .orFail(new NOT_FOUND_ERROR('Data is not found'))
-    .then((user) => res.status(SUCCESS_OK).send(user))
-    .catch(next);
+  processUserWithId(req, res, User.findById(req.user._id), next);
 };
 
 const login = (req, res, next) => {
