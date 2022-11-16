@@ -15,7 +15,7 @@ import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CardsContext } from "../contexts/CardsContext";
-import * as auth from "../utils/auth";
+import auth from "../utils/auth";
 
 function App() {
   const history = useHistory();
@@ -38,7 +38,7 @@ function App() {
 
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [toolTipStatus, setToolTipStatus] = React.useState("");
-  // const [token, setToken] = React.useState(localStorage.getItem("jwt"));
+  const [token, setToken] = React.useState(localStorage.getItem("jwt"));
 
   const isOpen =
     isEditProfilePopupOpen ||
@@ -87,15 +87,15 @@ function App() {
   }
 
   React.useEffect(() => {
-    if (isLoggedIn) {
+    if (token) {
       api
-        .getUserInfo()
+        .getUserInfo(token)
         .then((user) => {
           setCurrentUser(user);
         })
         .catch((err) => console.log(err));
     }
-  }, [isLoggedIn]);
+  }, [token]);
 
   function handleUpdateUser({ name, about }) {
     api
@@ -156,12 +156,13 @@ function App() {
   }
 
   React.useEffect(() => {
-    isLoggedIn &&
-    api
-      .getInitialCards()
-      .then(setCards)
-      .catch((err) => console.log(err));
-  }, [isLoggedIn]);
+    if (token) {
+      api
+        .getInitialCards(token)
+        .then(setCards)
+        .catch((err) => console.log(err));
+    }
+  }, [token]);
 
   const closeAllPopups = () => {
     setIsAddPlacePopupOpen(false);
@@ -190,7 +191,7 @@ function App() {
      auth
        .register(email, password)
        .then((res) => {
-         if (res.data) {
+         if (!res.message) {
            setToolTipStatus("success");
            setIsInfoTooltipOpen(true);
            history.push("/signin");
@@ -202,20 +203,17 @@ function App() {
        .catch((err) => {
          console.log(err);
        })
-     .finally(() => {
-         setToolTipStatus("fail");
-         setIsInfoTooltipOpen(true);
-       });
    }
 
-   function onLogin({ email, password }) {
+   function onLogin(email, password) {
      auth
        .login(email, password)
-       .then((res) => {
+       .then(res => {
          if (res.token) {
            setIsLoggedIn(true);
            setEmail(email);
-           localStorage.setItem("jwt", res.token);
+           localStorage.setItem("token", res.token);
+           setToken(res.token);
            history.push("/");
          } else {
            setToolTipStatus("fail");

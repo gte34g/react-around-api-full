@@ -1,40 +1,50 @@
-let BASE_URL = process.env.REACT_APP_BASE_URL;
+class Auth {
+  constructor({ url, headers }) {
+    this.baseUrl = url;
+    this.headers = headers;
+  }
 
-const customFetch = (url, headers) => {
-  return fetch(url, headers).then((res) =>
-    res.ok ? res.json() : Promise.reject(res.statusText)
-  );
-};
+  _customFetch(url, headers) {
+    return fetch(url, headers).then((res) => {
+      if (res) {
+        return res.json();
+      }
+      return Promise.reject(`Error: ${res.status}`);
+    });
+  }
 
-export const register = (email, password) => {
-  return customFetch(`${BASE_URL}/signup`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
-};
+  register(email, password) {
+    return this._customFetch(`${this.baseUrl}/signup`, {
+      headers: this.headers,
+      method: "POST",
+      body: JSON.stringify(email, password),
+    });
+  }
 
-export const login = (email, password) => {
-  return customFetch(`${BASE_URL}/signin`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
-};
+  login(email, password) {
+    return this._customFetch(`${this.baseUrl}/signin`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(email, password),
+    });
+  }
 
-export const checkToken = (token) => {
-  return customFetch(`${BASE_URL}/users/me`, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-};
+  checkToken(jwt) {
+    return this._customFetch(`${this.baseUrl}/users/me`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+  }
+}
+
+const auth = new Auth({
+  url: "https://api.gte34g.students.nomoredomainssbs.ru",
+  headers: { "Content-Type": "application/json" },
+});
+
+export default auth;
