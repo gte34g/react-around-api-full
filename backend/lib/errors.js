@@ -7,6 +7,7 @@ const USER_NOT_FOUND = 'No user found with that id';
 const CARD_NOT_FOUND = 'No card found with that id';
 const INVALID_DATA = 'Your input is not a valid data';
 const DEFAULT_ERROR = 'An error has occurred on the server';
+const DATA_EXIST = 'This data is already on our server';
 
 module.exports = {
   SUCCESS_OK,
@@ -16,5 +17,6 @@ module.exports = {
   CARD_NOT_FOUND,
   INVALID_DATA,
   DEFAULT_ERROR,
+  DATA_EXIST,
   ForbiddenError,
 };

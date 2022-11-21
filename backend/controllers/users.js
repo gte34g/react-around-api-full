@@ -6,9 +6,10 @@ const { JWT_SECRET } = require('../lib/config');
 const User = require('../models/user');
 
 const { processUserWithId } = require('../lib/helpers');
+const { INVALID_DATA, DATA_EXIST } = require('../lib/errors');
 
 const Unauthorized = ('../errors/Unauthorized');
-const ConflictError = ('../errors/ConflictError');
+// const ConflictError = ('../errors/ConflictError');
 const Validation = ('../errors/Validation.js');
 
 const getUsers = (req, res, next) => {
@@ -20,38 +21,22 @@ const getUserById = async (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        throw new ConflictError('Email already exists');
-      }
-      return bcrypt.hash(password, 10);
-    })
+  bcrypt
+    .hash(req.body.password, 10)
     .then((hash) =>
       User.create({
-        name,
-        about,
-        avatar,
-        email,
+        ...req.body,
         password: hash,
-      }))
-    .then((user) => res.status(201).send({
-      _id: user._id,
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-    }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new Validation(err.message));
-      } else {
-        next(err);
-      }
-    });
+      })
+        .then((user) => res.status(201).send(user))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            throw new Validation(INVALID_DATA);
+          } else {
+            throw new Validation(DATA_EXIST);
+          }
+        }))
+    .catch(next);
 };
 
 const updateUser = (req, res, next) => {
