@@ -187,11 +187,10 @@ function App() {
     };
   }, [isOpen]);
 
-   function onRegister({ email, password }) {
-     auth
-       .register(email, password)
+   function onRegister(email, password) {
+     auth.registerUser(email, password)
        .then((res) => {
-         if (!res.message) {
+         if (res.data) {
            setToolTipStatus("success");
            setIsInfoTooltipOpen(true);
            history.push("/signin");
@@ -202,7 +201,7 @@ function App() {
        })
        .catch((err) => {
          console.log(err);
-       })
+       });
    }
 
    function onLogin(email, password) {

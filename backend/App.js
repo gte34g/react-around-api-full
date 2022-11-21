@@ -12,7 +12,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
-const router = require('./routes');
+
+const router = require('./routes/index');
 
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
@@ -21,6 +22,7 @@ const limiter = rateLimit({
   max: 100,
 });
 app.use(limiter);
+app.use(express.json());
 app.use(cors());
 app.options('*', cors());
 app.use(helmet());

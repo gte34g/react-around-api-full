@@ -13,7 +13,7 @@ class Auth {
     });
   }
 
-  register(email, password) {
+  registerUser(email, password) {
     return this._customFetch(`${this.baseUrl}/signup`, {
       headers: this.headers,
       method: "POST",
