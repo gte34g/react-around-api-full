@@ -80,7 +80,7 @@ const login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
-      res.send({ data: user.toJSON(), token });
+      res.send({ token });
     })
     .catch(() => {
       next(new Unauthorized('Incorrect email or password'));

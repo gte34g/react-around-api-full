@@ -1,7 +1,13 @@
 const { Joi, celebrate } = require('celebrate');
 const { isObjectIdOrHexString } = require('mongoose');
+const validator = require('validator');
 
-const urlRegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
+const validateUrl = (v, helpers) => {
+  if (validator.isURL(v)) {
+    return v;
+  }
+  return helpers.error('string.uri');
+};
 
 const validateObjId = celebrate({
   params: Joi.object().keys({
@@ -22,7 +28,7 @@ const validateCardBody = celebrate({
         'stting.max': 'The max length is 30',
         'string.empty': 'This field must be filled up',
       }),
-    link: Joi.string().required().pattern(urlRegExp)
+    link: Joi.string().required().pattern(validateUrl)
       .message('The "link" field must be a valid URL'),
   }),
 });
@@ -49,7 +55,7 @@ const validateUserBody = celebrate({
       .messages({
         'sring.required': 'The "email" field must be filled in',
       }),
-    avatar: Joi.string().pattern(urlRegExp)
+    avatar: Joi.string().pattern(validateUrl)
       .message('The "avatar" field must be a valid URL'),
   }),
 });
@@ -70,7 +76,7 @@ const validateAuthentication = celebrate({
 
 const validateAvatar = celebrate({
   body: {
-    avatar: Joi.string().required().pattern(urlRegExp)
+    avatar: Joi.string().required().pattern(validateUrl)
       .message('The "avatar" field must be a valid URL'),
   },
 });
@@ -91,7 +97,7 @@ const validateProfile = celebrate({
 });
 
 module.exports = {
-  urlRegExp,
+  validateUrl,
   validateObjId,
   validateCardBody,
   validateUserBody,
