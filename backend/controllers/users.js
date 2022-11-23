@@ -6,11 +6,11 @@ const { JWT_SECRET } = require('../lib/config');
 const User = require('../models/user');
 
 const { processUserWithId } = require('../lib/helpers');
-const { INVALID_DATA, DATA_EXIST } = require('../lib/errors');
+// const { INVALID_DATA, DATA_EXIST } = require('../lib/errors');
 
 const Unauthorized = ('../errors/Unauthorized');
-// const ConflictError = ('../errors/ConflictError');
-const Validation = ('../errors/Validation.js');
+const Validation = ('../errors/Validation');
+const ConflictError = ('../errors/ConflictError');
 
 const getUsers = (req, res, next) => {
   processUserWithId(req, res, User.findById(req.user._id), next);
@@ -21,22 +21,32 @@ const getUserById = async (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  bcrypt
-    .hash(req.body.password, 10)
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictError('Email already exists');
+      }
+      return bcrypt.hash(password, 10);
+    })
     .then((hash) =>
       User.create({
-        ...req.body,
+        name,
+        about,
+        avatar,
+        email,
         password: hash,
-      })
-        .then((user) => res.status(201).send(user))
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            throw new Validation(INVALID_DATA);
-          } else {
-            throw new Validation(DATA_EXIST);
-          }
-        }))
-    .catch(next);
+      }))
+    .then((user) => res.status(201).send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new Validation(err.message));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const updateUser = (req, res, next) => {
@@ -80,7 +90,7 @@ const login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
-      res.send({ token });
+      res.send({ data: user.toJSON(), token });
     })
     .catch(() => {
       next(new Unauthorized('Incorrect email or password'));

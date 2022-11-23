@@ -4,13 +4,10 @@ class Auth {
     this.headers = headers;
   }
 
-  _customFetch(url, headers) {
-    return fetch(url, headers).then((res) => {
-      if (res) {
-        return res.json();
-      }
-      return Promise.reject(`Error: ${res.status}`);
-    });
+  _customFetch = (url, headers) => {
+    return fetch(url, headers).then((res) =>
+      res.ok ? res.json() : Promise.reject(res.statusText)
+    );
   }
 
   registerUser(email, password) {

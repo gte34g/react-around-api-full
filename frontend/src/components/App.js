@@ -201,7 +201,11 @@ function App() {
        })
        .catch((err) => {
          console.log(err);
-       });
+         setToolTipStatus("fail");
+       })
+      .finally(() => {
+        setIsInfoTooltipOpen(true);
+      });
    }
 
    function onLogin(email, password) {
