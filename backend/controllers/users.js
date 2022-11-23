@@ -8,9 +8,9 @@ const User = require('../models/user');
 const { processUserWithId } = require('../lib/helpers');
 // const { INVALID_DATA, DATA_EXIST } = require('../lib/errors');
 
-const Unauthorized = ('../errors/Unauthorized');
-const Validation = ('../errors/Validation');
-const ConflictError = ('../errors/ConflictError');
+const Unauthorized = require('../errors/Unauthorized');
+const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
 
 const getUsers = (req, res, next) => {
   processUserWithId(req, res, User.findById(req.user._id), next);
@@ -42,7 +42,7 @@ const createUser = (req, res, next) => {
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new Validation(err.message));
+        next(new BadRequestError(err.message));
       } else {
         next(err);
       }

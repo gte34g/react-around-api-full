@@ -1,4 +1,4 @@
-const InvalidError = require('../errors/Validation');
+const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFound');
 
 const processCardWithId = (req, res, action, next) =>
@@ -15,7 +15,7 @@ const processCardWithId = (req, res, action, next) =>
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new InvalidError(err.message));
+        next(new BadRequestError(err.message));
       } else {
         next(err);
       }
@@ -31,9 +31,9 @@ const processUserWithId = (req, res, action, next) =>
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new InvalidError(err.message));
+        next(new BadRequestError(err.message));
       } else if (err.name === 'ValidationError') {
-        next(new InvalidError(err.message));
+        next(new BadRequestError(err.message));
       } else {
         next(err);
       }
