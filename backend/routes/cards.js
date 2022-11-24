@@ -9,14 +9,15 @@ const {
 } = require('../controllers/cards');
 
 const {
+  validateAuthentication,
   validateObjId,
-  validateCardBody,
+  newCardValidation,
 } = require('../middlewares/validation');
 
-router.get('/', getCards);
-router.post('/', validateCardBody, createCard);
-router.put('/:_id/likes', validateObjId, likeCard);
-router.delete('/:_id', validateObjId, deleteCardById);
-router.delete('/:_id/likes', validateObjId, disLikeCard);
+router.get('/', validateAuthentication, getCards);
+router.post('/', validateAuthentication, newCardValidation, createCard);
+router.put('/:_id/likes', validateAuthentication, validateObjId, likeCard);
+router.delete('/:_id', validateAuthentication, validateObjId, deleteCardById);
+router.delete('/:_id/likes', validateAuthentication, validateObjId, disLikeCard);
 
 module.exports = router;

@@ -17,6 +17,8 @@ const router = require('./routes/index');
 
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
+app.use(requestLogger);
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -27,8 +29,6 @@ app.use(cors());
 app.options('*', cors());
 app.use(helmet());
 app.use(bodyParser.json());
-
-app.use(requestLogger);
 
 app.use(router);
 
