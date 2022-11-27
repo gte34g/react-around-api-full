@@ -1,22 +1,24 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const { JWT_SECRET } = require('../lib/config');
+// const { JWT_SECRET } = require('../lib/config');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 const User = require('../models/user');
 
 const { processUserWithId } = require('../lib/helpers');
-// const { INVALID_DATA, DATA_EXIST } = require('../lib/errors');
+const { INVALID_DATA, USER_NOT_FOUND } = require('../lib/errors');
 
 const Unauthorized = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
+const NotFoundError = require('../errors/NotFound');
 
 const getUsers = (req, res, next) => {
   processUserWithId(req, res, User.findById(req.user._id), next);
 };
 
-const getUserById = async (req, res, next) => {
+const getUserById = (req, res, next) => {
   processUserWithId(req, res, User.findById(req.params.id), next);
 };
 
@@ -76,25 +78,38 @@ const updateAvatar = (req, res, next) => {
 };
 
 const getCurrentUser = (req, res, next) => {
-  processUserWithId(req, res, User.findById(req.user._id), next);
+  const { _id } = req.user;
+  User.findById(_id)
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        throw new NotFoundError(USER_NOT_FOUND);
+      } else if (err.name === 'CastError') {
+        throw new BadRequestError(INVALID_DATA);
+      }
+    })
+    .catch(next);
 };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
-    .then((user) => {
+    .then((data) => {
       const token = jwt.sign(
-        { _id: user._id },
-        JWT_SECRET,
+        { _id: data._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'JWT_SECRET',
         {
           expiresIn: '7d',
         },
       );
-      res.send({ data: user.toJSON(), token });
+      const { password, ...user } = data._doc;
+      res.send({ token, user });
     })
-    .catch(() => {
-      next(new Unauthorized('Incorrect email or password'));
-    });
+    .catch((err) => {
+      throw new Unauthorized(err.message);
+    })
+    .catch(next);
 };
 
 module.exports = {
