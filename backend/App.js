@@ -1,18 +1,18 @@
 const express = require('express');
 
+require('dotenv').config({ path: './.env' });
+
 const app = express();
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 
 const { PORT = 3000 } = process.env;
-require('dotenv').config({ path: './.env' });
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
-
 const router = require('./routes/index');
 
 mongoose.connect('mongodb://localhost:27017/aroundb');
@@ -31,7 +31,6 @@ app.use(helmet());
 app.use(bodyParser.json());
 
 app.use(router);
-
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Server will crash now');

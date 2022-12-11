@@ -1,3 +1,4 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
@@ -6,20 +7,30 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 const User = require('../models/user');
 
-const { processUserWithId } = require('../lib/helpers');
-const { INVALID_DATA, USER_NOT_FOUND } = require('../lib/errors');
+const processUserWithId = require('../lib/helpers');
 
 const Unauthorized = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFound');
 
+const getUserData = (id, res, next) => {
+  User.findById(id)
+    .orFail(() => NotFoundError('User ID not found'))
+    .then((users) => res.send({ users }))
+    .catch(next);
+};
+
 const getUsers = (req, res, next) => {
-  processUserWithId(req, res, User.findById(req.user._id), next);
+  getUserData(req.params.id, res, next);
 };
 
 const getUserById = (req, res, next) => {
   processUserWithId(req, res, User.findById(req.params.id), next);
+};
+
+const getCurrentUser = (req, res, next) => {
+  getUserData(req.user._id, res, next);
 };
 
 const createUser = (req, res, next) => {
@@ -77,23 +88,23 @@ const updateAvatar = (req, res, next) => {
   );
 };
 
-const getCurrentUser = (req, res, next) => {
-  const { _id } = req.user;
-  User.findById(_id)
-    .orFail()
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundError(USER_NOT_FOUND);
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError(INVALID_DATA);
-      }
-    })
-    .catch(next);
-};
+// const getCurrentUser = (req, res, next) => {
+//   const { _id } = req.user;
+//   User.findById(_id)
+//     .orFail()
+//     .then((user) => res.send(user))
+//     .catch((err) => {
+//       if (err.name === 'DocumentNotFoundError') {
+//         throw new NotFoundError(USER_NOT_FOUND);
+//       } else if (err.name === 'CastError') {
+//         throw new BadRequestError(INVALID_DATA);
+//       }
+//     })
+//     .catch(next);
+// };
 
 const login = (req, res, next) => {
-  const { email, password } = req.body;
+  const { password, email } = req.body;
   return User.findUserByCredentials(email, password)
     .then((data) => {
       const token = jwt.sign(
@@ -103,6 +114,7 @@ const login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
+      // eslint-disable-next-line no-shadow
       const { password, ...user } = data._doc;
       res.send({ token, user });
     })

@@ -8,13 +8,13 @@ class Auth {
     return fetch(url, headers).then((res) =>
       res.ok ? res.json() : Promise.reject(res.statusText)
     );
-  }
+  };
 
   registerUser(email, password) {
     return this._customFetch(`${this.baseUrl}/signup`, {
       headers: this.headers,
       method: "POST",
-      body: JSON.stringify(email, password),
+      body: JSON.stringify({email, password}),
     });
   }
 
@@ -25,15 +25,16 @@ class Auth {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(email, password),
+      body: JSON.stringify({email, password}),
     });
   }
 
-  checkToken(jwt) {
+  checkToken(token) {
     return this._customFetch(`${this.baseUrl}/users/me`, {
       headers: {
+        Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
+        Authorization: `Bearer ${token}`,
       },
     });
   }

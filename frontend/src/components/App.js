@@ -38,7 +38,7 @@ function App() {
 
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [toolTipStatus, setToolTipStatus] = React.useState("");
-  const [token, setToken] = React.useState(localStorage.getItem("jwt"));
+  const [token, setToken] = React.useState(undefined);
 
   const isOpen =
     isEditProfilePopupOpen ||
@@ -49,22 +49,21 @@ function App() {
 
 
   React.useEffect(() => {
-    const token = localStorage.getItem("token");
+    setToken(localStorage.getItem("jwt"))
     if (token) {
       auth
         .checkToken(token)
         .then((res) => {
-          if (res.data._id) {
-            setEmail(res.data.email);
+          if (res) {
             setIsLoggedIn(true);
             history.push("/");
           } else {
-            localStorage.removeItem("token");
+            localStorage.removeItem("jwt");
           }
         })
         .catch((err) => console.log(err));
     }
-  }, [history]);
+  }, [token, history]);
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -209,27 +208,20 @@ function App() {
    }
 
    function onLogin(email, password) {
-     auth
-       .login(email, password)
-       .then(res => {
+     auth.login(email, password)
+       .then((res) => {
          if (res.token) {
+           localStorage.setItem("token", res.token);
            setIsLoggedIn(true);
            setEmail(email);
-           localStorage.setItem("token", res.token);
-           setToken(res.token);
            history.push("/");
+           setCurrentUser(res.user);
          } else {
            setToolTipStatus("fail");
            setIsInfoTooltipOpen(true);
          }
        })
-       .catch((err) => {
-         console.log(err);
-       })
-       .finally(() => {
-         setToolTipStatus("fail");
-         setIsInfoTooltipOpen(true);
-       });
+       .catch((err) => console.log(err));
    }
 
    function onSignOut() {
