@@ -8,16 +8,22 @@ const {
   disLikeCard,
 } = require('../controllers/cards');
 
-const {
-  validateAuthentication,
-  validateObjId,
-  newCardValidation,
-} = require('../middlewares/validation');
+// const {
+//   validateAuthentication,
+//   validateObjId,
+//   newCardValidation,
+// } = require('../middlewares/validation');
 
-router.get('/', validateAuthentication, getCards);
-router.post('/', validateAuthentication, newCardValidation, createCard);
-router.put('/:_id/likes', validateAuthentication, validateObjId, likeCard);
-router.delete('/:_id', validateAuthentication, validateObjId, deleteCardById);
-router.delete('/:_id/likes', validateAuthentication, validateObjId, disLikeCard);
+// router.get('/', validateAuthentication, getCards);
+// router.post('/', validateAuthentication, newCardValidation, createCard);
+// router.put('/:_id/likes', validateAuthentication, validateObjId, likeCard);
+// router.delete('/:_id', validateAuthentication, validateObjId, deleteCardById);
+// router.delete('/:_id/likes', validateAuthentication, validateObjId, disLikeCard);
+
+router.get('/', getCards);
+router.post('/', createCard);
+router.put('/:_id/likes', likeCard);
+router.delete('/:_id', deleteCardById);
+router.delete('/:_id/likes', disLikeCard);
 
 module.exports = router;

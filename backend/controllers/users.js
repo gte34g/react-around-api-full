@@ -14,26 +14,30 @@ const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFound');
 
-const getUserData = (id, res, next) => {
+const getUserData = (error, id, res, next) => {
   User.findById(id)
     .orFail(() => NotFoundError('User ID not found'))
     .then((users) => res.send({ users }))
     .catch(next);
+  console.log(`error ${error.message}`);
 };
 
-const getUsers = (req, res, next) => {
+const getUsers = (error, req, res, next) => {
   getUserData(req.params.id, res, next);
+  console.log(`error ${error.message}`);
 };
 
-const getUserById = (req, res, next) => {
+const getUserById = (error, req, res, next) => {
   processUserWithId(req, res, User.findById(req.params.id), next);
+  console.log(`error ${error.message}`);
 };
 
-const getCurrentUser = (req, res, next) => {
+const getCurrentUser = (error, req, res, next) => {
   getUserData(req.user._id, res, next);
+  console.log(`error ${error.message}`);
 };
 
-const createUser = (req, res, next) => {
+const createUser = (error, req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -60,9 +64,10 @@ const createUser = (req, res, next) => {
         next(err);
       }
     });
+  console.log(`error ${error.message}`);
 };
 
-const updateUser = (req, res, next) => {
+const updateUser = (error, req, res, next) => {
   const { name, about } = req.body;
   const { _id } = req.user;
   processUserWithId(
@@ -75,9 +80,10 @@ const updateUser = (req, res, next) => {
     ),
     next,
   );
+  console.log(`error ${error.message}`);
 };
 
-const updateAvatar = (req, res, next) => {
+const updateAvatar = (error, req, res, next) => {
   const { _id } = req.user;
   const { avatar } = req.body;
   processUserWithId(
@@ -86,6 +92,7 @@ const updateAvatar = (req, res, next) => {
     User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }),
     next,
   );
+  console.log(`error ${error.message}`);
 };
 
 // const getCurrentUser = (req, res, next) => {
