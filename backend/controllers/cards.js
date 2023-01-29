@@ -8,14 +8,13 @@ const {
   ForbiddenError,
 } = require('../lib/errors');
 
-const getCards = (error, req, res, next) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((card) => res.status(200).send(card))
     .catch(next);
-  console.log(`error ${error.message}`);
 };
 
-const createCard = (error, req, res, next) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(201).send(card))
@@ -26,10 +25,9 @@ const createCard = (error, req, res, next) => {
         next(err);
       }
     });
-  console.log(`error ${error.message}`);
 };
 
-const deleteCardById = (error, req, res, next) => {
+const deleteCardById = (req, res, next) => {
   const { _id } = req.params;
   Card.findByIdAndRemove(_id)
     .orFail(() => {
@@ -44,10 +42,9 @@ const deleteCardById = (error, req, res, next) => {
       }
     })
     .catch(next);
-  console.log(`error ${error.message}`);
 };
 
-const likeCard = (error, req, res, next) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -61,10 +58,9 @@ const likeCard = (error, req, res, next) => {
       }
       return next(err);
     });
-  console.log(`error ${error.message}`);
 };
 
-const disLikeCard = (error, req, res, next) => {
+const disLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -78,7 +74,6 @@ const disLikeCard = (error, req, res, next) => {
       }
       return next(err);
     });
-  console.log(`error ${error.message}`);
 };
 
 module.exports = {
