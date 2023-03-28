@@ -41,7 +41,7 @@ class Auth {
 }
 
 const auth = new Auth({
-  url: "https://api.gte34g.students.nomoredomainssbs.ru",
+  url: "https://api.gte34g.chickenkiller.com",
   headers: { "Content-Type": "application/json" },
 });
 

@@ -16,11 +16,7 @@ const errorHandler = require('./middlewares/errorHandler');
 const router = require('./routes/index');
 
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb://localhost:27017/aroundb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
+mongoose.connect('mongodb://localhost:27017/aroundb');
 
 app.use(requestLogger);
 
