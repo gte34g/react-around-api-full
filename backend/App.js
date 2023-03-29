@@ -18,6 +18,9 @@ const router = require('./routes/index');
 mongoose.set('strictQuery', false);
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
+app.use(cors());
+app.options('*', cors());
+
 app.use(requestLogger);
 
 const limiter = rateLimit({
@@ -26,8 +29,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 app.use(express.json());
-app.use(cors());
-app.options('*', cors());
+
 app.use(helmet());
 app.use(bodyParser.json());
 
