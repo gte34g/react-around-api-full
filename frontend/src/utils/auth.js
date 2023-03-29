@@ -41,7 +41,7 @@ class Auth {
 }
 
 const auth = new Auth({
-  url: "http://api.gte34g.chickenkiller.com",
+  url: "http://localhost:3000",
   headers: { "Content-Type": "application/json" },
 });
 
