@@ -7,6 +7,6 @@ The API of "Around the U.S." with authorization and registration handled by the 
 
 * Fullstack repo: [https://github.com/gte34g/react-around-api-full]
 
-* Fullstack live demo: [https://gte34g.chickenkiller.com/]
+* Fullstack live demo: [https://gte34g.mooo.com/]
 
-* Api deployed to remote GCP server: [https://api.gte34g.chickenkiller.com/]
+* Api deployed to remote GCP server: [https://api.gte34g.mooo.com/]
