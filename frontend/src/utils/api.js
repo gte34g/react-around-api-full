@@ -73,7 +73,7 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: "https://api.gte34g.chickenkiller.com",
+  baseUrl: "http://api.gte34g.chickenkiller.com",
   headers: {
     "Content-Type": "application/json",
     authorization: `Bearer ${localStorage.getItem("token")}`,
