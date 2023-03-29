@@ -44,11 +44,21 @@ const newCardValidation = celebrate({
 
 const validateUserBody = celebrate({
   body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).messages({
+      'string.empty': 'Name is required (error here 1)',
+      'string.min': 'Name must be at least 2 characters long',
+      'string.max': 'Name must be less than 30 characters long',
+    }),
+    about: Joi.string().min(2).max(30).messages({
+      'string.empty': 'About is required',
+      'string.min': 'About must be at least 2 characters long',
+      'string.max': 'About must be less than 30 characters long',
+    }),
     email: Joi.string().required().custom(validateEmail),
-    password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(validateUrl),
+    password: Joi.string().required().min(8).messages({
+      'string.empty': 'Password is required',
+      'string.min': 'Password must be at least 8 characters long',
+    }),
   }),
 });
 
