@@ -41,7 +41,7 @@ class Auth {
 }
 
 const auth = new Auth({
-  url: "http://localhost:3000",
+  url: "https://gte34g.mooo.com",
   headers: { "Content-Type": "application/json" },
 });
 
