@@ -9,14 +9,15 @@ const {
 
 const {
   // validateObjId,
+  authValidation,
   validateAvatar,
   validateProfile,
 } = require('../middlewares/validation');
 
-router.get('/', getUsers);
-router.get('/:_id', getUserById);
-router.get('/me', getCurrentUser);
-router.patch('/me', validateProfile, updateUser);
-router.patch('/me/avatar', validateAvatar, updateAvatar);
+router.get('/', authValidation, getUsers);
+router.get('/:_id', authValidation, getUserById);
+router.get('/me', authValidation, getCurrentUser);
+router.patch('/me', authValidation, updateUser);
+router.patch('/me/avatar', authValidation, validateAvatar, validateProfile, updateAvatar);
 
 module.exports = router;

@@ -12,9 +12,9 @@ class Auth {
 
   registerUser(email, password) {
     return this._customFetch(`${this.baseUrl}/signup`, {
-      headers: this.headers,
       method: "POST",
-      body: JSON.stringify({email, password}),
+      headers: this.headers,
+      body: JSON.stringify({ email, password }),
     });
   }
 

@@ -16,6 +16,16 @@ function validateEmail(string) {
   return string;
 }
 
+const authValidation = celebrate({
+  headers: Joi.object()
+
+    .keys({
+      authorization: Joi.string().required(),
+    })
+
+    .unknown(true),
+});
+
 const validateObjId = celebrate({
   params: Joi.object().keys({
     cardId: Joi.string()
@@ -91,6 +101,7 @@ const validateLogin = celebrate({
 });
 
 module.exports = {
+  authValidation,
   validateUrl,
   validateObjId,
   validateCardBody,
