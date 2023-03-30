@@ -189,7 +189,7 @@ function App() {
    function onRegister(email, password) {
      auth.registerUser(email, password)
        .then((res) => {
-         if (res.data) {
+         if (res.data._id) {
            setToolTipStatus("success");
            setIsInfoTooltipOpen(true);
            history.push("/signin");
