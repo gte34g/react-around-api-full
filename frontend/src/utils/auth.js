@@ -1,7 +1,6 @@
 class Auth {
   constructor({ url, headers }) {
     this.baseUrl = url;
-    this.headers = headers;
   }
 
   _customFetch = (url, headers) => {
@@ -13,7 +12,10 @@ class Auth {
   registerUser(email, password) {
     return this._customFetch(`${this.baseUrl}/signup`, {
       method: "POST",
-      headers: this.headers,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ email, password }),
     });
   }
@@ -41,8 +43,7 @@ class Auth {
 }
 
 const auth = new Auth({
-  url: "https://gte34g.mooo.com",
-  headers: { "Content-Type": "application/json" },
+  url: "https://api.gte34g.mooo.com",
 });
 
 export default auth;

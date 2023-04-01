@@ -24,7 +24,7 @@ const processCardWithId = (req, res, action, next) =>
 
 const processUserWithId = (req, res, next) => {
   const { _id } = req.params;
-  User.findOne(_id)
+  User.findOne({ _id })
     .orFail()
     .then((users) => {
       res.status(200).send(users);
