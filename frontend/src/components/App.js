@@ -225,7 +225,7 @@ function App() {
    }
 
    function onSignOut() {
-     localStorage.removeItem("jwt");
+     localStorage.removeItem("token");
      setIsLoggedIn(false);
      history.push("/signin");
    }

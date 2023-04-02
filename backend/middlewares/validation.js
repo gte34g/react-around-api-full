@@ -9,12 +9,12 @@ const validateUrl = (v, helpers) => {
   return helpers.error('string.uri');
 };
 
-function validateEmail(string) {
-  if (!validator.isEmail(string)) {
-    throw new Error('Invalid Email');
+const validateEmail = (value, helpers) => {
+  if (validator.isEmail(value)) {
+    return value;
   }
-  return string;
-}
+  return helpers.message('invalid Email');
+};
 
 const authValidation = celebrate({
   headers: Joi.object()
@@ -64,6 +64,7 @@ const validateUserBody = celebrate({
       'string.min': 'About must be at least 2 characters long',
       'string.max': 'About must be less than 30 characters long',
     }),
+    avatar: Joi.string().uri(),
     email: Joi.string().required().custom(validateEmail),
     password: Joi.string().required().min(8).messages({
       'string.empty': 'Password is required',
