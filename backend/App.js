@@ -23,10 +23,10 @@ const userRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const NoRoute = require('./routes/noRoute');
 // mongoose.set('strictQuery', false);
-const url = process.env.CONNECTION_URL.toString();
+// const url = process.env.CONNECTION_URL.toString();
 
 mongoose
-  .connect(url, {
+  .connect('mongodb://127.0.0.1:27017/aroundb', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
