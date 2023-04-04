@@ -1,45 +1,43 @@
-class Auth {
-  constructor({ url, headers }) {
-    this.baseUrl = url;
-    this.headers = headers;
-  }
+export const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.gte34g.mooo.com"
+    : "http://localhost:3000";
 
-  registerUser(email, password) {
-    return this._customFetch(`${this.baseUrl}/signup`, {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-  }
+const customFetch = (url, headers) => {
+  return fetch(url, headers).then((res) =>
+    res.ok ? res.json() : Promise.reject(res.statusText)
+  );
+};
 
-  login(email, password) {
-    return this._customFetch(`${this.baseUrl}/signin`, {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-  }
+export const registerUser = (email, password) => {
+  return customFetch(`${BASE_URL}/signup`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+};
 
-  checkToken(token) {
-    return this._customFetch(`${this.baseUrl}/users/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
+export const login = (email, password) => {
+  return customFetch(`${BASE_URL}/signin`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+};
 
-  _customFetch(url, options) {
-    const headers = Object.assign({}, this.headers, options.headers);
-    return fetch(url, { ...options, headers }).then((res) =>
-      res.ok ? res.json() : Promise.reject(res.statusText)
-    );
-  }
-}
-
-const auth = new Auth({
-  url: "https://api.gte34g.mooo.com",
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  },
-});
-
-export default auth;
+export const checkToken = (token) => {
+  return customFetch(`${BASE_URL}/users/me`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

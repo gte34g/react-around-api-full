@@ -15,7 +15,7 @@ import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { CardsContext } from "../contexts/CardsContext";
-import auth from "../utils/auth";
+import * as auth from "../utils/auth";
 
 function App() {
   const history = useHistory();

@@ -12,24 +12,22 @@ const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { celebrate, Joi } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 // const router = require('./routes/index');
 const { createUser, login } = require('./controllers/users');
-const { validateLogin, validateSignup } = require('./middlewares/validation');
+// const { validateLogin, validateSignup } = require('./middlewares/validation');
 // const routes = require('./routes');
 const auth = require('./middlewares/auth');
 const userRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const NoRoute = require('./routes/noRoute');
+const NotFoundError = require('./routes/noRoute');
 // mongoose.set('strictQuery', false);
 // const url = process.env.CONNECTION_URL.toString();
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/aroundb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect('mongodb://127.0.0.1:27017/aroundb')
   .then(() => {
     // eslint-disable-next-line no-console
     console.log('Connected to MongoDB :)');
@@ -43,13 +41,36 @@ app.options('*', cors());
 
 app.use(requestLogger);
 
-app.post('/signin', validateLogin, login);
-app.post('/signup', validateSignup, createUser);
+app.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
+    }),
+  }),
+  login,
+);
+
+app.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+      email: Joi.string().required().email(),
+      password: Joi.string().required(),
+    }),
+  }),
+  createUser,
+);
 
 app.use(auth);
-
 app.use('/', userRouter);
 app.use('/', cardsRouter);
+
+app.use('*', NotFoundError);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -71,8 +92,6 @@ app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);
-
-app.use('*', NoRoute);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
