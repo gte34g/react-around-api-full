@@ -10,6 +10,12 @@ const customFetch = (url, headers) => {
 };
 
 export const registerUser = (email, password) => {
+  console.log(
+    "registerUser called with email:",
+    email,
+    "and password:",
+    password
+  );
   return customFetch(`${BASE_URL}/signup`, {
     method: "POST",
     headers: {
@@ -21,6 +27,7 @@ export const registerUser = (email, password) => {
 };
 
 export const login = (email, password) => {
+  console.log("login called with email:", email, "and password:", password);
   return customFetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: {
@@ -32,6 +39,7 @@ export const login = (email, password) => {
 };
 
 export const checkToken = (token) => {
+  console.log("checkToken called with token:", token);
   return customFetch(`${BASE_URL}/users/me`, {
     method: "GET",
     headers: {
