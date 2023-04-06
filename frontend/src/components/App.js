@@ -49,21 +49,22 @@ function App() {
 
 
   React.useEffect(() => {
-    setToken(localStorage.getItem("jwt"))
+    const token = localStorage.getItem("token");
     if (token) {
       auth
         .checkToken(token)
         .then((res) => {
-          if (res) {
+          if (res.data._id) {
+            setEmail(res.data.email);
             setIsLoggedIn(true);
             history.push("/");
           } else {
-            localStorage.removeItem("jwt");
+            localStorage.removeItem("token");
           }
         })
         .catch((err) => console.log(err));
     }
-  }, [token, history]);
+  }, []);
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -186,26 +187,30 @@ function App() {
     };
   }, [isOpen]);
 
-   function onRegister(email, password) {
-     auth.registerUser(email, password)
-       .then((res) => {
-         if (res.data) {
-           setToolTipStatus("success");
-           setIsInfoTooltipOpen(true);
-           history.push("/signin");
-         } else {
-           setToolTipStatus("fail");
-           setIsInfoTooltipOpen(true);
-         }
-       })
-       .catch((err) => {
-         console.log(err);
+ function onRegister(email, password) {
+   auth
+     .register(email, password)
+     .then((res) => {
+       console.log(res);
+       if (res.data._id) {
+         setToolTipStatus("success");
+         setIsInfoTooltipOpen(true);
+         history.push("/signin");
+       } else {
          setToolTipStatus("fail");
-       })
-      .finally(() => {
-        setIsInfoTooltipOpen(true);
-      });
-   }
+         setIsInfoTooltipOpen(true);
+       }
+     })
+     .catch((err) => {
+       console.log(err); // added console.log statement
+       setToolTipStatus("fail");
+     })
+     .finally(() => {
+       setIsInfoTooltipOpen(true);
+     });
+ }
+
+
 
    function onLogin(email, password) {
      auth.login(email, password)

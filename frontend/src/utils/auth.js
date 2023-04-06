@@ -1,15 +1,15 @@
-export const BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://api.gte34g.mooo.com"
-    : "http://localhost:3000";
+export const BASE_URL = "https://api.gte34g.mooo.com";
 
 const customFetch = (url, headers) => {
+  console.log("Request sent to:", url);
+  console.log("Headers:", headers);
   return fetch(url, headers).then((res) =>
     res.ok ? res.json() : Promise.reject(res.statusText)
   );
 };
 
-export const registerUser = (email, password) => {
+
+export const register = (email, password) => {
   console.log(
     "registerUser called with email:",
     email,
@@ -22,7 +22,7 @@ export const registerUser = (email, password) => {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email: email, password: password }),
   });
 };
 
