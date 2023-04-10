@@ -52,6 +52,25 @@ export const login = (email, password) => {
 };
 
 
+// export const checkToken = (token) => {
+//   return fetch(`${BASE_URL}/users/me`, {
+//     method: "GET",
+//     headers: {
+//       Accept: "application/json",
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//   })
+//     .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)))
+//     .then((data) => {
+//       return data;
+//     })
+//     .catch((e) => {
+//       console.error(e);
+//       throw e;
+//     });
+// };
+
 export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
@@ -61,7 +80,17 @@ export const checkToken = (token) => {
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)))
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else if (res.status === 401) {
+        throw new Error("Unauthorized");
+      } else if (res.status === 404) {
+        throw new Error("User not found");
+      } else {
+        throw new Error("Server error");
+      }
+    })
     .then((data) => {
       return data;
     })
