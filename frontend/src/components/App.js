@@ -187,12 +187,12 @@ function App() {
     };
   }, [isOpen]);
 
- function onRegister(email, password) {
+ function onRegister({email, password}) {
    auth
      .register(email, password)
      .then((res) => {
        console.log(res);
-       if (res.data._id) {
+       if (res.data) {
          setToolTipStatus("success");
          setIsInfoTooltipOpen(true);
          history.push("/signin");
@@ -210,15 +210,15 @@ function App() {
      });
  }
 
-
-
-   function onLogin(email, password) {
-     auth.login(email, password)
+   function onLogin({email, password}) {
+     auth
+       .login(email, password)
        .then((res) => {
          if (res.token) {
-           localStorage.setItem("token", res.token);
            setIsLoggedIn(true);
-           setEmail(email);
+           setEmail({ email });
+           localStorage.setItem("token", res.token);
+           setToken(res.token);
            history.push("/");
            setCurrentUser(res.user);
          } else {
@@ -226,7 +226,13 @@ function App() {
            setIsInfoTooltipOpen(true);
          }
        })
-       .catch((err) => console.log(err));
+       .catch((err) => {
+         console.log(err); // added console.log statement
+         setToolTipStatus("fail");
+       })
+       .finally(() => {
+         setIsInfoTooltipOpen(true);
+       });
    }
 
    function onSignOut() {

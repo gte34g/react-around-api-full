@@ -8,11 +8,12 @@ function Login({ onLogin }) {
   
   const handleSubmit = (e) => {
       e.preventDefault();
-    const userData = {
+    const data = {
       email,
       password,
     };
-    onLogin(userData);
+    console.log(data);
+    onLogin(data);
   };
   
   return (

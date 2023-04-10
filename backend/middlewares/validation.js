@@ -1,5 +1,5 @@
 const { Joi, celebrate } = require('celebrate');
-const { ObjectId } = require('mongoose').Types;
+// const { ObjectId } = require('mongoose').Types;
 const validator = require('validator');
 
 const validateUrl = (v, helpers) => {
@@ -26,16 +26,23 @@ const authValidation = celebrate({
     .unknown(true),
 });
 
+// const validateObjId = celebrate({
+//   params: Joi.object().keys({
+//     cardId: Joi.string()
+//       .required()
+//       .custom((value, helpers) => {
+//         if (ObjectId.isValid(value)) {
+//           return value;
+//         }
+//         return helpers.message('Invalid id');
+//       }),
+//   }),
+// });
+
 const validateObjId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string()
-      .required()
-      .custom((value, helpers) => {
-        if (ObjectId.isValid(value)) {
-          return value;
-        }
-        return helpers.message('Invalid id');
-      }),
+    id: Joi.string().required().alphanum().length(24)
+      .hex(),
   }),
 });
 
