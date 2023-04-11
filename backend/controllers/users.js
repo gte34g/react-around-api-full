@@ -25,8 +25,24 @@ const getUsers = (req, res, next) => {
   getUserData(req.params.id, res, next);
 };
 
+// const getUserById = async (req, res) => {
+//   const { _id } = req.params;
+//   User.findById(_id)
+//     .orFail()
+//     .then((user) => res.send(user))
+//     .catch((err) => {
+//       if (err.name === 'DocumentNotFoundError') {
+//         res.status(NotFoundError).send({ Error: err.message });
+//       } else if (err.name === 'CastError') {
+//         res.status(NotFoundError).send({ Error: err.message });
+//       } else {
+//         res.status(BadRequestError).send({ Error: err.message });
+//       }
+//     });
+// };
+
 const getUserById = (req, res, next) => {
-  processUserWithId(req, res, User.findById(req.params.id), next);
+  processUserWithId(req, res, User.findById(req.params._id), next);
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -95,9 +111,9 @@ const updateAvatar = (req, res, next) => {
 //     .then((user) => res.send(user))
 //     .catch((err) => {
 //       if (err.name === 'DocumentNotFoundError') {
-//         throw new NotFoundError(USER_NOT_FOUND);
+//         throw new NotFoundError(err.message);
 //       } else if (err.name === 'CastError') {
-//         throw new BadRequestError(INVALID_DATA);
+//         throw new BadRequestError(err.message);
 //       }
 //     })
 //     .catch(next);

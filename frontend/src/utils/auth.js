@@ -1,5 +1,9 @@
-require("dotenv").config();
-export const BASE_URL = "https://api.gte34g.mooo.com";
+// export const BASE_URL = "https://api.gte34g.mooo.com";
+
+export const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.gte34g.mooo.com"
+    : "http://localhost:3000";
 
 export const register = (email, password) => {
   if (!email || !password) {
@@ -51,7 +55,6 @@ export const login = (email, password) => {
     });
 };
 
-
 // export const checkToken = (token) => {
 //   return fetch(`${BASE_URL}/users/me`, {
 //     method: "GET",
@@ -80,22 +83,11 @@ export const checkToken = (token) => {
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      } else if (res.status === 401) {
-        throw new Error("Unauthorized");
-      } else if (res.status === 404) {
-        throw new Error("User not found");
-      } else {
-        throw new Error("Server error");
-      }
-    })
+    .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)))
     .then((data) => {
       return data;
     })
     .catch((e) => {
-      console.error(e);
-      throw e;
+      console.log(e);
     });
 };

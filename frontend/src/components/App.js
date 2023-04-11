@@ -32,7 +32,7 @@ function App() {
   });
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
-
+  const [userData, setUserData] = React.useState([]);
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [email, setEmail] = React.useState("");
 
@@ -48,23 +48,24 @@ function App() {
 
 
 
-  React.useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      auth
-        .checkToken(token)
-        .then((res) => {
-          if (res.data._id) {
-            setEmail(res.data.email);
-            setIsLoggedIn(true);
-            history.push("/");
-          } else {
-            localStorage.removeItem("token");
-          }
-        })
-        .catch((err) => console.log(err));
-    }
-  }, []);
+React.useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    auth
+      .checkToken(token)
+      .then((res) => {
+        if (res) {
+          setEmail(res.email);
+          setIsLoggedIn(true);
+          history.push("/");
+        } else {
+          localStorage.removeItem("token");
+        }
+      })
+      .catch((err) => console.log(err));
+  }
+}, []); 
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -90,8 +91,8 @@ function App() {
     if (token) {
       api
         .getUserInfo(token)
-        .then((user) => {
-          setCurrentUser(user);
+        .then((res) => {
+          setCurrentUser(res.data);
         })
         .catch((err) => console.log(err));
     }
@@ -159,7 +160,9 @@ function App() {
     if (token) {
       api
         .getInitialCards(token)
-        .then(setCards)
+        .then((res) => {
+          setCards(res.data);
+        })
         .catch((err) => console.log(err));
     }
   }, [token]);
@@ -216,11 +219,10 @@ function App() {
        .then((res) => {
          if (res.token) {
            setIsLoggedIn(true);
-           setEmail({ email });
+           setUserData({ email });
            localStorage.setItem("token", res.token);
            setToken(res.token);
            history.push("/");
-           setCurrentUser(res.user);
          } else {
            setToolTipStatus("fail");
            setIsInfoTooltipOpen(true);

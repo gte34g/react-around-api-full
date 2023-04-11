@@ -1,4 +1,3 @@
-require("dotenv").config();
 class Api {
   constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
@@ -76,18 +75,11 @@ class Api {
   }
 }
 
-let node_env = "production";
-
-let baseUrl =
-  node_env === "production"
-    ? process.env.REACT_APP_BASE_URL
-    : "http://localhost:3000";
-
 const api = new Api({
-  baseUrl,
+  baseUrl: "https://api.gte34g.mooo.com",
   headers: {
-    "Content-Type": "application/json",
     authorization: `Bearer ${localStorage.getItem("token")}`,
+    "Content-Type": "application/json",
   },
 });
 
