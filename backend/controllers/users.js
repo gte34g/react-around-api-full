@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 // const { JWT_SECRET } = require('../lib/config');
-const { NODE_ENV, JWT_SECRET } = process.env;
-
+const JWT_SECRET = 'secret-something';
 const User = require('../models/user');
 
 const processUserWithId = require('../lib/helpers');
@@ -13,40 +12,49 @@ const Unauthorized = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFound');
+const errorHandler = require('../middlewares/errorHandler');
 
-const getUserData = (id, res, next) => {
-  User.findById(id)
-    .orFail(() => NotFoundError('User ID not found'))
-    .then((users) => res.send({ users }))
-    .catch(next);
-};
-
-const getUsers = (req, res, next) => {
-  getUserData(req.params.id, res, next);
-};
-
-// const getUserById = async (req, res) => {
-//   const { _id } = req.params;
-//   User.findById(_id)
-//     .orFail()
-//     .then((user) => res.send(user))
-//     .catch((err) => {
-//       if (err.name === 'DocumentNotFoundError') {
-//         res.status(NotFoundError).send({ Error: err.message });
-//       } else if (err.name === 'CastError') {
-//         res.status(NotFoundError).send({ Error: err.message });
-//       } else {
-//         res.status(BadRequestError).send({ Error: err.message });
-//       }
-//     });
+// const getUserData = (id, res, next) => {
+//   User.findById(id)
+//     .orFail(() => NotFoundError('User ID not found'))
+//     .then((users) => res.send({ data: users }))
+//     .catch(next);
 // };
 
-const getUserById = (req, res, next) => {
-  processUserWithId(req, res, User.findById(req.params._id), next);
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.send(errorHandler).send(err);
+  }
 };
 
+const getUserById = async (req, res) => {
+  const { id } = req.params;
+  User.findById(id)
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NotFoundError).send(err.message);
+      } else if (err.name === 'CastError') {
+        res.status(NotFoundError).send(err.message);
+      } else {
+        res.status(errorHandler).send(err.message);
+      }
+    });
+};
+
+// const getUserById = (req, res, next) => {
+//   processUserWithId(req, res, User.findById(req.params.id), next);
+// };
+
 const getCurrentUser = (req, res, next) => {
-  getUserData(req.user._id, res, next);
+  User.findById(req.params.id)
+    .orFail(() => NotFoundError('User ID not found'))
+    .then((user) => res.send({ user }))
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
@@ -80,12 +88,12 @@ const createUser = (req, res, next) => {
 
 const updateUser = (req, res, next) => {
   const { name, about } = req.body;
-  const { _id } = req.user;
+  const { id } = req.user;
   processUserWithId(
     req,
     res,
     User.findByIdAndUpdate(
-      _id,
+      id,
       { name, about },
       { runValidators: true, new: true },
     ),
@@ -94,19 +102,19 @@ const updateUser = (req, res, next) => {
 };
 
 const updateAvatar = (req, res, next) => {
-  const { _id } = req.user;
+  const { id } = req.user;
   const { avatar } = req.body;
   processUserWithId(
     req,
     res,
-    User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }),
+    User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true }),
     next,
   );
 };
 
 // const getCurrentUser = (req, res, next) => {
-//   const { _id } = req.user;
-//   User.findById(_id)
+//   const { id } = req.user;
+//   User.findById(id)
 //     .orFail()
 //     .then((user) => res.send(user))
 //     .catch((err) => {
@@ -122,17 +130,12 @@ const updateAvatar = (req, res, next) => {
 const login = (req, res, next) => {
   const { password, email } = req.body;
   return User.findUserByCredentials(email, password)
-    .then((data) => {
-      const token = jwt.sign(
-        { _id: data._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'JWT_SECRET',
-        {
-          expiresIn: '7d',
-        },
-      );
+    .then((user) => {
+      const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+        expiresIn: '7d',
+      });
       // eslint-disable-next-line no-shadow
-      const { password, ...user } = data._doc;
-      res.send({ token, user });
+      res.send({ data: user.toJSON(), token });
     })
     .catch((err) => {
       throw new Unauthorized(err.message);
