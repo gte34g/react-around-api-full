@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
+const { ObjectId } = require('mongoose').Types;
 // const { JWT_SECRET } = require('../lib/config');
 const JWT_SECRET = 'secret-something';
 const User = require('../models/user');
@@ -12,49 +13,45 @@ const Unauthorized = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFound');
-const errorHandler = require('../middlewares/errorHandler');
+const { SUCCESS_OK, DEFAULT_ERROR_CODE } = require('../lib/errors');
 
-// const getUserData = (id, res, next) => {
-//   User.findById(id)
-//     .orFail(() => NotFoundError('User ID not found'))
-//     .then((users) => res.send({ data: users }))
-//     .catch(next);
-// };
-
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.send(errorHandler).send(err);
-  }
+// GET
+const getUsers = (req, res, next) => {
+  User.find({})
+    .then((users) => res.status(SUCCESS_OK).send({ data: users })) // 200
+    .catch((err) => next(new DEFAULT_ERROR_CODE(err.message))); // 500
 };
 
-const getUserById = async (req, res) => {
-  const { id } = req.params;
-  User.findById(id)
-    .orFail()
-    .then((user) => res.send(user))
+const getUserById = (req, res, next) => {
+  const { _id } = req.params;
+  User.findById(_id)
+    .orFail(() => next(new NotFoundError('User not found'))) // 404
+    .then((user) => {
+      res.status(SUCCESS_OK).send({ data: user }); // 200
+    })
     .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(NotFoundError).send(err.message);
-      } else if (err.name === 'CastError') {
-        res.status(NotFoundError).send(err.message);
-      } else {
-        res.status(errorHandler).send(err.message);
+      if (err.name === 'CastError') {
+        return next(new BadRequestError('Invalid user')); // 400
       }
+      if (err instanceof NotFoundError) {
+        return next(err); // 404
+      }
+      return next(new DEFAULT_ERROR_CODE(err.message)); // 500
     });
 };
 
-// const getUserById = (req, res, next) => {
-//   processUserWithId(req, res, User.findById(req.params.id), next);
-// };
+// GET
+// eslint-disable-next-line consistent-return
+const getUser = (req, res, next) => {
+  const { _id } = req.params;
+  if (!ObjectId.isValid(_id)) {
+    return next(new BadRequestError('Invalid user ID')); // 400
+  }
+  getUserById(_id, res, req, next);
+};
 
 const getCurrentUser = (req, res, next) => {
-  User.findById(req.params.id)
-    .orFail(() => NotFoundError('User ID not found'))
-    .then((user) => res.send({ user }))
-    .catch(next);
+  getUserById(req.user.id, res, req, next);
 };
 
 const createUser = (req, res, next) => {
@@ -88,12 +85,12 @@ const createUser = (req, res, next) => {
 
 const updateUser = (req, res, next) => {
   const { name, about } = req.body;
-  const { id } = req.user;
+  const { _id } = req.user;
   processUserWithId(
     req,
     res,
     User.findByIdAndUpdate(
-      id,
+      _id,
       { name, about },
       { runValidators: true, new: true },
     ),
@@ -102,19 +99,19 @@ const updateUser = (req, res, next) => {
 };
 
 const updateAvatar = (req, res, next) => {
-  const { id } = req.user;
+  const { _id } = req.user;
   const { avatar } = req.body;
   processUserWithId(
     req,
     res,
-    User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true }),
+    User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }),
     next,
   );
 };
 
 // const getCurrentUser = (req, res, next) => {
-//   const { id } = req.user;
-//   User.findById(id)
+//   const { _id } = req.user;
+//   User.findById(_id)
 //     .orFail()
 //     .then((user) => res.send(user))
 //     .catch((err) => {
@@ -131,7 +128,7 @@ const login = (req, res, next) => {
   const { password, email } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ id: user.id }, JWT_SECRET, {
+      const token = jwt.sign({ id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
       // eslint-disable-next-line no-shadow
@@ -145,6 +142,7 @@ const login = (req, res, next) => {
 
 module.exports = {
   getUsers,
+  getUser,
   getUserById,
   createUser,
   updateUser,

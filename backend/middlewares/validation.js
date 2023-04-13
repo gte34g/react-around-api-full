@@ -1,5 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
-
+const { ObjectId } = require('mongoose').Types;
 const validator = require('validator');
 
 function validateUrl(string) {
@@ -58,10 +58,16 @@ const updateAvatarValidation = celebrate({
 
 const validateUserId = celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().hex().length(24),
+    _id: Joi.string().required().custom((value, helpers) => {
+      if (ObjectId.isValid(value)) {
+        return value;
+      }
+      // eslint-disable-next-line no-console
+      console.log(`Invalid _id parameter: ${value}`);
+      return helpers.message('Invalid id');
+    }),
   }),
 });
-
 const newCardValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),

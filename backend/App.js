@@ -11,14 +11,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { validateUser, validateLogin } = require('./middlewares/validation');
+// const { validateUser, validateLogin } = require('./middlewares/validation');
 const errorHandler = require('./middlewares/errorHandler');
-const auth = require('./middlewares/auth');
-const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards');
-const noRoute = require('./routes/noRoute');
-
-const { login, createUser } = require('./controllers/users');
+// const auth = require('./middlewares/auth');
+// const userRouter = require('./routes/users');
+// const cardRouter = require('./routes/cards');
+// const noRoute = require('./routes/noRoute');
+const router = require('./routes/index');
+// const { login, createUser } = require('./controllers/users');
 
 mongoose.connect('mongodb://localhost:27017/aroundb');
 
@@ -35,14 +35,15 @@ app.use(limiter);
 app.use(express.json());
 app.use(requestLogger);
 app.use(helmet());
-app.post('/signin', validateLogin, login);
-app.post('/signup', validateUser, createUser);
+app.use(router);
+// app.post('/signin', validateLogin, login);
+// app.post('/signup', validateUser, createUser);
 
-app.use(auth);
+// app.use(auth);
 
-app.use('/users', userRouter);
-app.use('/cards', cardRouter);
-app.use('*', noRoute);
+// app.use('/users', userRouter);
+// app.use('/cards', cardRouter);
+// app.use('*', noRoute);
 
 app.use(errorLogger);
 
