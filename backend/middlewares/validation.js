@@ -62,7 +62,6 @@ const validateUserId = celebrate({
       if (ObjectId.isValid(value)) {
         return value;
       }
-      // eslint-disable-next-line no-console
       console.log(`Invalid _id parameter: ${value}`);
       return helpers.message('Invalid id');
     }),

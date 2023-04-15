@@ -213,29 +213,35 @@ React.useEffect(() => {
      });
  }
 
-   function onLogin({email, password}) {
-     auth
-       .login(email, password)
-       .then((res) => {
-         if (res.token) {
-           setIsLoggedIn(true);
-           setUserData({ email });
-           localStorage.setItem("token", res.token);
-           setToken(res.token);
-           history.push("/");
-         } else {
-           setToolTipStatus("fail");
-           setIsInfoTooltipOpen(true);
-         }
-       })
-       .catch((err) => {
-         console.log(err); // added console.log statement
-         setToolTipStatus("fail");
-       })
-       .finally(() => {
-         setIsInfoTooltipOpen(true);
-       });
-   }
+function onLogin({ email, password }) {
+  auth
+    .login(email, password)
+    .then((res) => {
+      if (res) {
+        setIsLoggedIn(true);
+        setUserData({ email });
+        localStorage.setItem("token", res);
+        setToken(res);
+        history.push("/");
+        setIsInfoTooltipOpen(true); // move setIsInfoTooltipOpen to the then block
+      } else {
+        setToolTipStatus("fail");
+        setIsInfoTooltipOpen(true);
+      }
+    })
+    .catch((err) => {
+      if (err.response && err.response.status === 401) {
+        // check for err.response first to avoid undefined error
+        setToolTipStatus("invalid-credentials");
+      } else {
+        setToolTipStatus("fail");
+      }
+      console.log(err); // log the error for debugging purposes
+      setIsInfoTooltipOpen(true);
+    });
+}
+
+
 
    function onSignOut() {
      localStorage.removeItem("token");

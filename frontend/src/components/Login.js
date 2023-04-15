@@ -7,12 +7,15 @@ function Login({ onLogin }) {
   const [password, setPassword] = React.useState("");
   
   const handleSubmit = (e) => {
-      e.preventDefault();
+    e.preventDefault();
+    if (!email || !password) {
+      // display a message to the user indicating that the email and password fields are required
+      return;
+    }
     const data = {
       email,
       password,
     };
-    console.log(data);
     onLogin(data);
   };
   

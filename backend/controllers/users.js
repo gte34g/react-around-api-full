@@ -41,13 +41,12 @@ const getUserById = (req, res, next) => {
 };
 
 // GET
-// eslint-disable-next-line consistent-return
 const getUser = (req, res, next) => {
   const { _id } = req.params;
   if (!ObjectId.isValid(_id)) {
     return next(new BadRequestError('Invalid user ID')); // 400
   }
-  getUserById(_id, res, req, next);
+  return getUserById(_id, res, req, next);
 };
 
 const getCurrentUser = (req, res, next) => {
@@ -128,7 +127,7 @@ const login = (req, res, next) => {
   const { password, email } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ id: user._id }, JWT_SECRET, {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
       // eslint-disable-next-line no-shadow

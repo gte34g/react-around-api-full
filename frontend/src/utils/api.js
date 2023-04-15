@@ -1,14 +1,18 @@
 class Api {
   constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
+
     this._headers = headers;
   }
 
-  _customFetch(url, headers) {
-    return fetch(url, headers).then((res) =>
-      res.ok ? res.json() : Promise.reject(`Error: ${res.status}`)
-    );
-  }
+  _customFetch = async (url, headers) => {
+    const res = await fetch(url, headers);
+    if (res.ok) {
+      return res.json();
+    } else {
+      return Promise.reject(res.statusText);
+    }
+  };
 
   getInitialCards() {
     return this._customFetch(`${this._baseUrl}/cards`, {
@@ -72,11 +76,18 @@ class Api {
   }
 }
 
+let node_env = "production";
+
+let baseUrl =
+  node_env === "production"
+    ? process.env.REACT_APP_BASE_URL
+    : "http://localhost:3000";
+
 const api = new Api({
-  baseUrl: "https://api.gte34g.mooo.com",
+  baseUrl,
   headers: {
-    "Content-Type": "application/json",
     authorization: `Bearer ${localStorage.getItem("token")}`,
+    "Content-Type": "application/json",
   },
 });
 
