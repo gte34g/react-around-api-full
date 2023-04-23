@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { ObjectId } = require('mongoose').Types;
@@ -13,7 +12,10 @@ const Unauthorized = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFound');
-const { SUCCESS_OK, DEFAULT_ERROR_CODE } = require('../lib/errors');
+const {
+  SUCCESS_OK,
+  DEFAULT_ERROR_CODE,
+} = require('../lib/errors');
 
 // GET
 const getUsers = (req, res, next) => {
@@ -43,6 +45,7 @@ const getUserById = (req, res, next) => {
 // GET
 const getUser = (req, res, next) => {
   const { _id } = req.params;
+  console.log('_id:', _id);
   if (!ObjectId.isValid(_id)) {
     return next(new BadRequestError('Invalid user ID')); // 400
   }
@@ -50,7 +53,7 @@ const getUser = (req, res, next) => {
 };
 
 const getCurrentUser = (req, res, next) => {
-  getUserById(req.user.id, res, req, next);
+  getUserById(req.user._id, res, req, next);
 };
 
 const createUser = (req, res, next) => {
@@ -124,7 +127,7 @@ const updateAvatar = (req, res, next) => {
 // };
 
 const login = (req, res, next) => {
-  const { password, email } = req.body;
+  const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {

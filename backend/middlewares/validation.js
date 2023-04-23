@@ -37,9 +37,6 @@ const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().custom(validateEmail),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(validateUrl),
   }),
 });
 
@@ -58,13 +55,16 @@ const updateAvatarValidation = celebrate({
 
 const validateUserId = celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().required().custom((value, helpers) => {
-      if (ObjectId.isValid(value)) {
-        return value;
-      }
-      console.log(`Invalid _id parameter: ${value}`);
-      return helpers.message('Invalid id');
-    }),
+    _id: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (ObjectId.isValid(value)) {
+          return value;
+        }
+        // eslint-disable-next-line no-console
+        console.log(`Invalid _id parameter: ${value}`);
+        return helpers.message('Invalid id');
+      }),
   }),
 });
 const newCardValidation = celebrate({
@@ -79,6 +79,13 @@ const cardValidationId = celebrate({
     cardId: Joi.string().hex().length(24),
   }),
 });
+const validateGetUser = celebrate({
+  params: Joi.object().keys({
+    _id: Joi.string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .required(),
+  }),
+});
 
 module.exports = {
   authValidation,
@@ -91,4 +98,5 @@ module.exports = {
   validateUserId,
   newCardValidation,
   cardValidationId,
+  validateGetUser,
 };

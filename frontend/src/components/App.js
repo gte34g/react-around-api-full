@@ -32,7 +32,7 @@ function App() {
   });
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
-  const [userData, setUserData] = React.useState([]);
+
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [email, setEmail] = React.useState("");
 
@@ -48,24 +48,23 @@ function App() {
 
 
 
-React.useEffect(() => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    auth
-      .checkToken(token)
-      .then((res) => {
-        if (res) {
-          setEmail(res.email);
-          setIsLoggedIn(true);
-          history.push("/");
-        } else {
-          localStorage.removeItem("token");
-        }
-      })
-      .catch((err) => console.log(err));
-  }
-}, []); 
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      auth
+        .checkToken(token)
+        .then((res) => {
+          if (res) {
+            setEmail(res.email);
+            setIsLoggedIn(true);
+            history.push("/");
+          } else {
+            localStorage.removeItem("token");
+          }
+        })
+        .catch((err) => console.log(err));
+    }
+  }, []);
 
   const handleEditAvatarClick = () => {
     setIsEditAvatarPopupOpen(true);
@@ -217,15 +216,14 @@ function onLogin({ email, password }) {
   auth
     .login(email, password)
     .then((res) => {
-      if (res) {
+      if (res.token) {
         setIsLoggedIn(true);
-        setUserData({ email });
-        localStorage.setItem("token", res);
+        setEmail(email);
+        localStorage.setItem("token", res.token);
         setToken(res);
         history.push("/");
         setIsInfoTooltipOpen(true); // move setIsInfoTooltipOpen to the then block
       } else {
-        setToolTipStatus("fail");
         setIsInfoTooltipOpen(true);
       }
     })

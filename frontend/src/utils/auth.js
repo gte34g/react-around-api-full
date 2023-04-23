@@ -34,6 +34,7 @@ export const register = (email, password) => {
 };
 
 export async function login(email, password) {
+  console.log("login called with email:", email, "and password:", password);
   const response = await fetch(`${BASE_URL}/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -88,21 +89,3 @@ export const checkToken = (token) => {
 //     });
 // };
 
-// export const checkToken = (token) => {
-//   return fetch(`${BASE_URL}/users/me`, {
-//     method: "GET",
-//     headers: {
-//       Accept: "application/json",
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${token}`,
-//     },
-//   })
-//     .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)))
-//     .then((data) => {
-//       return data;
-//     })
-//     .catch((e) => {
-//       console.error(e);
-//       throw e;
-//     });
-// };

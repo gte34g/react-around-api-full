@@ -9,12 +9,13 @@ const {
 } = require('../controllers/users');
 
 const auth = require('../middlewares/auth');
-const { validateUserId } = require('../middlewares/validation');
+const { validateGetUser } = require('../middlewares/validation');
 
-router.get('/', auth, getUsers);
-router.get('/:_id', validateUserId, getUser);
+router.get('/', getUsers);
 router.get('/me', getCurrentUser);
-router.patch('/me', auth, updateUser);
+router.get('/:_id', validateGetUser, getUser);
+
+router.patch('/me', updateUser);
 router.patch(
   '/me/avatar',
   auth,
