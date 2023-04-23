@@ -45,6 +45,7 @@ const getUserById = (req, res, next) => {
 // GET
 const getUser = (req, res, next) => {
   const { _id } = req.params;
+  // eslint-disable-next-line no-console
   console.log('_id:', _id);
   if (!ObjectId.isValid(_id)) {
     return next(new BadRequestError('Invalid user ID')); // 400
