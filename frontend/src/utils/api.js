@@ -7,6 +7,7 @@ class Api {
 
   _customFetch = async (url, headers) => {
     const res = await fetch(url, headers);
+    console.log('This is API:', res)
     if (res.ok) {
       return res.json();
     } else {
@@ -76,15 +77,8 @@ class Api {
   }
 }
 
-let node_env = "production";
-
-let baseUrl =
-  node_env === "production"
-    ? process.env.REACT_APP_BASE_URL
-    : "http://localhost:3000";
-
 const api = new Api({
-  baseUrl,
+  baseUrl: 'https://api.gte34g.mooo.com',
   headers: {
     authorization: `Bearer ${localStorage.getItem("token")}`,
     "Content-Type": "application/json",

@@ -92,6 +92,7 @@ function App() {
         .getUserInfo(token)
         .then((res) => {
           setCurrentUser(res.data);
+          console.log('This is getCurrentUser & api.getUserInfo:', res.data);
         })
         .catch((err) => console.log(err));
     }

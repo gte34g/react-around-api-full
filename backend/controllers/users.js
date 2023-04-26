@@ -11,50 +11,48 @@ const processUserWithId = require('../lib/helpers');
 const Unauthorized = require('../errors/Unauthorized');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
-const NotFoundError = require('../errors/NotFound');
+// const NotFoundError = require('../errors/NotFound');
 const {
-  SUCCESS_OK,
+  ERROR_CODE,
+  NOT_FOUND_ERROR,
   DEFAULT_ERROR_CODE,
+  USER_NOT_FOUND,
+  INVALID_DATA,
+  DEFAULT_ERROR,
 } = require('../lib/errors');
 
 // GET
-const getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.status(SUCCESS_OK).send({ data: users })) // 200
-    .catch((err) => next(new DEFAULT_ERROR_CODE(err.message))); // 500
+// const getUsers = (req, res, next) => {
+//   User.find({})
+//     .then((users) => res.status(SUCCESS_OK).send(users)) // 200
+//     .catch((err) => next(new DEFAULT_ERROR_CODE(err.message))); // 500
+// };
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+
+    res.send(users);
+  } catch (err) {
+    res.send(DEFAULT_ERROR_CODE).send(err);
+  }
+  console.log('getUsers:', getUsers);
 };
 
-const getUserById = (req, res, next) => {
+const getUserById = async (req, res) => {
   const { _id } = req.params;
   User.findById(_id)
-    .orFail(() => next(new NotFoundError('User not found'))) // 404
-    .then((user) => {
-      res.status(SUCCESS_OK).send({ data: user }); // 200
-    })
+    .orFail()
+    .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Invalid user')); // 400
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND_ERROR).send({ Error: USER_NOT_FOUND });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
+      } else {
+        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
       }
-      if (err instanceof NotFoundError) {
-        return next(err); // 404
-      }
-      return next(new DEFAULT_ERROR_CODE(err.message)); // 500
     });
-};
-
-// GET
-const getUser = (req, res, next) => {
-  const { _id } = req.params;
-  // eslint-disable-next-line no-console
-  console.log('_id:', _id);
-  if (!ObjectId.isValid(_id)) {
-    return next(new BadRequestError('Invalid user ID')); // 400
-  }
-  return getUserById(_id, res, req, next);
-};
-
-const getCurrentUser = (req, res, next) => {
-  getUserById(req.user._id, res, req, next);
 };
 
 const createUser = (req, res, next) => {
@@ -112,21 +110,6 @@ const updateAvatar = (req, res, next) => {
   );
 };
 
-// const getCurrentUser = (req, res, next) => {
-//   const { _id } = req.user;
-//   User.findById(_id)
-//     .orFail()
-//     .then((user) => res.send(user))
-//     .catch((err) => {
-//       if (err.name === 'DocumentNotFoundError') {
-//         throw new NotFoundError(err.message);
-//       } else if (err.name === 'CastError') {
-//         throw new BadRequestError(err.message);
-//       }
-//     })
-//     .catch(next);
-// };
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
@@ -145,11 +128,9 @@ const login = (req, res, next) => {
 
 module.exports = {
   getUsers,
-  getUser,
   getUserById,
   createUser,
   updateUser,
   updateAvatar,
   login,
-  getCurrentUser,
 };
