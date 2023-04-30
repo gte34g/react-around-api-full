@@ -54,8 +54,8 @@ function App() {
       auth
         .checkToken(token)
         .then((res) => {
-          if (res) {
-            setEmail(res.email);
+          if (res.data && res.data._id) {
+            setEmail(res.data.email);
             setIsLoggedIn(true);
             history.push("/");
           } else {
@@ -87,16 +87,14 @@ function App() {
   }
 
   React.useEffect(() => {
-    if (token) {
       api
-        .getUserInfo(token)
+        .getUserInfo()
         .then((res) => {
-          setCurrentUser(res.data);
-          console.log('This is getCurrentUser & api.getUserInfo:', res.data);
+          setCurrentUser(res);
+          console.log('This is getCurrentUser & api.getUserInfo:', res);
         })
         .catch((err) => console.log(err));
-    }
-  }, [token]);
+  }, []);
 
   function handleUpdateUser({ name, about }) {
     api
@@ -223,21 +221,11 @@ function onLogin({ email, password }) {
         localStorage.setItem("token", res.token);
         setToken(res);
         history.push("/");
-        setIsInfoTooltipOpen(true); // move setIsInfoTooltipOpen to the then block
       } else {
         setIsInfoTooltipOpen(true);
       }
     })
-    .catch((err) => {
-      if (err.response && err.response.status === 401) {
-        // check for err.response first to avoid undefined error
-        setToolTipStatus("invalid-credentials");
-      } else {
-        setToolTipStatus("fail");
-      }
-      console.log(err); // log the error for debugging purposes
-      setIsInfoTooltipOpen(true);
-    });
+    .catch((err) => console.log(err));
 }
 
 

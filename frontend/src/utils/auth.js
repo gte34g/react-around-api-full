@@ -64,28 +64,3 @@ export const checkToken = (token) => {
       console.log(e);
     });
 };
-
-
-// export async function login(email, password) {
-//   console.log("login called with email:", email, "and password:", password);
-//   const response = await fetch(`${BASE_URL}/signin`, {
-//     method: "POST",
-//     headers: {"Content-Type": "application/json"},
-//     body: JSON.stringify({ "password": password, "email": email }),
-//   })
-//     .then((response) => {
-//       console.log("login response status:", response.status);
-//       return response.json();
-//     })
-//     .then((data) => {
-//       console.log("login response data:", data);
-//       if (data.token) {
-//         localStorage.setItem("token", data.token);
-//         return data;
-//       }
-//     })
-//     .catch((error) => {
-//       console.log("login error:", error);
-//     });
-// };
-

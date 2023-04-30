@@ -1,78 +1,92 @@
 const Card = require('../models/card');
 
 const {
-  SUCCESS_OK,
+  // SUCCESS_OK,
   ERROR_CODE,
   NOT_FOUND_ERROR,
   CARD_NOT_FOUND,
-  ForbiddenError,
+  // ForbiddenError,
+  DEFAULT_ERROR_CODE,
+  PASSED_CODE,
+  INVALID_DATA,
+  DEFAULT_ERROR,
 } = require('../lib/errors');
 
-const getCards = (req, res, next) => {
-  Card.find({})
-    .then((cards) => res.status(200).send({ data: cards }))
-    .catch(next);
+const getCards = async (req, res) => {
+  try {
+    const cards = await Card.find({});
+
+    res.send(cards);
+  } catch (err) {
+    res.status(DEFAULT_ERROR_CODE).send(err);
+  }
 };
 
-const createCard = (req, res, next) => {
-  const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send(card))
+const createCard = (req, res) => {
+  Card.create({ ...req.body, owner: req.user._id })
+    .then((card) => res.status(PASSED_CODE).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ERROR_CODE(err.message));
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(ERROR_CODE).send({ Error: err.message });
+      } else if (err.name === 'ValidationError') {
+        res.status(ERROR_CODE).send({ Error: err.message });
       } else {
-        next(err);
+        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
       }
     });
 };
 
-const deleteCardById = (req, res, next) => {
+const deleteCardById = (req, res) => {
   const { _id } = req.params;
   Card.findByIdAndRemove(_id)
-    .orFail(() => {
-      throw new NOT_FOUND_ERROR(CARD_NOT_FOUND);
-    })
-    .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
-        next(new ForbiddenError('You are not authorized to delete this card'));
+    .orFail()
+    .then((card) => res.send(card))
+    .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND_ERROR).send({ Error: CARD_NOT_FOUND });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
       } else {
-        Card.findByIdAndRemove(_id).then((deletedCard) =>
-          res.status(200).send(deletedCard));
+        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
       }
-    })
-    .catch(next);
+    });
 };
 
-const likeCard = (req, res, next) => {
+const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new NOT_FOUND_ERROR('Data is not found'))
-    .then((card) => res.status(SUCCESS_OK).send(card))
+    .orFail()
+    .then((card) => res.send({ card }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new ERROR_CODE('Invalid data'));
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND_ERROR).send({ Error: CARD_NOT_FOUND });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
+      } else {
+        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
       }
-      return next(err);
     });
 };
 
-const disLikeCard = (req, res, next) => {
+const disLikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new NOT_FOUND_ERROR('Data is not found'))
-    .then((card) => res.status(SUCCESS_OK).send(card))
+    .orFail()
+    .then((card) => res.send({ card }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new ERROR_CODE('Invalid data'));
+      if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND_ERROR).send({ Error: CARD_NOT_FOUND });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
+      } else {
+        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
       }
-      return next(err);
     });
 };
 
