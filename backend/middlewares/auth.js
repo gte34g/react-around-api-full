@@ -9,7 +9,7 @@ const auth = (req, res, next) => {
   console.log('Authorization header:', authorization);
   console.log('req.headers:', req.headers);
   console.log(typeof authorization);
-  console.log('This is the auth.js', authorization);
+  // console.log('This is the auth.js', authorization);
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return next(new Unauthorized('You are not authorized'));
   }

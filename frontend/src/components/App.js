@@ -88,12 +88,13 @@ function App() {
 
   React.useEffect(() => {
       api
-        .getUserInfo()
+        .getUserInfo(token)
         .then((res) => {
           setCurrentUser(res);
           console.log('This is getCurrentUser & api.getUserInfo:', res);
         })
-        .catch((err) => console.log(err));
+      .catch((err) => console.log(err));
+    console.log("Token value:", token);
   }, []);
 
   function handleUpdateUser({ name, about }) {
@@ -218,7 +219,8 @@ function onLogin({ email, password }) {
       if (res.token) {
         setIsLoggedIn(true);
         setEmail(email);
-        localStorage.setItem("token", res.token);
+        localStorage.setItem("token", res.token)
+        console.log("Token value:", localStorage.getItem("token"));
         setToken(res);
         history.push("/");
       } else {
@@ -230,11 +232,14 @@ function onLogin({ email, password }) {
 
 
 
-   function onSignOut() {
-     localStorage.removeItem("token");
-     setIsLoggedIn(false);
-     history.push("/signin");
-   }
+function onSignOut() {
+  console.log("Removing token from local storage...");
+  localStorage.removeItem("token");
+  console.log("Token removed successfully.");
+  setIsLoggedIn(false);
+  setCurrentUser("");
+  history.push("/signin");
+}
 
   return (
     <CurrentUserContext.Provider value={currentUser}>

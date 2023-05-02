@@ -16,11 +16,11 @@ class Api {
   };
 
   getInitialCards() {
+    console.log("Request Headers:", this._headers);
     return this._customFetch(`${this._baseUrl}/cards`, {
       headers: this._headers,
     });
   }
-
   getUserInfo() {
     return this._customFetch(`${this._baseUrl}/users/me`, {
       headers: this._headers,

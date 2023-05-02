@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-// const { ObjectId } = require('mongoose').Types;
+const { ObjectId } = require('mongoose').Types;
 // const { JWT_SECRET } = require('../lib/config');
 const JWT_SECRET = 'secret-something';
 const User = require('../models/user');
@@ -21,6 +21,13 @@ const {
   DEFAULT_ERROR,
 } = require('../lib/errors');
 
+// GET
+// const getUsers = (req, res, next) => {
+//   User.find({})
+//     .then((users) => res.status(SUCCESS_OK).send(users)) // 200
+//     .catch((err) => next(new DEFAULT_ERROR_CODE(err.message))); // 500
+// };
+
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -33,7 +40,7 @@ const getUsers = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-  const { _id } = req.params;
+  const { _id } = req.user;
   User.findById(_id)
     .orFail()
     .then((user) => res.send(user))
@@ -77,26 +84,19 @@ const createUser = (req, res, next) => {
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
+  const { name, about } = req.body;
   const { _id } = req.user;
-  User.findByIdAndUpdate(
-    _id,
-    { name: req.body.name, about: req.body.about },
-    { runValidators: true, new: true },
-  )
-    .orFail()
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND_ERROR).send({ Error: USER_NOT_FOUND });
-      } else if (err.name === 'CastError') {
-        res.status(ERROR_CODE).send({ Error: INVALID_DATA });
-      } else if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ Error: err.message });
-      } else {
-        res.status(DEFAULT_ERROR_CODE).send({ Error: DEFAULT_ERROR });
-      }
-    });
+  processUserWithId(
+    req,
+    res,
+    User.findByIdAndUpdate(
+      _id,
+      { name, about },
+      { runValidators: true, new: true },
+    ),
+    next,
+  );
 };
 
 const updateAvatar = (req, res) => {
